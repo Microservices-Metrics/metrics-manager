@@ -14,8 +14,8 @@ public class MetricService implements Serializable {
     private String name;
     private String type;
     private String url;
-    private String measurementFormat;
-    private String measurementDescription;
+    private String metricFormat;
+    private String metricDescription;
     private String outputExample;
 
 
