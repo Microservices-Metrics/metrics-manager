@@ -12,9 +12,12 @@ public class MetricService implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idService;
     private String name;
+    private String type;
     private String url;
+    private String measurementFormat;
+    private String measurementDescription;
+    private String outputExample;
 
-    // TODO: serializar objetos dinâmicos para os parâmetros
 
     public UUID getIdService() {
         return idService;
@@ -30,6 +33,14 @@ public class MetricService implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
     }
 
     public String getUrl() {
