@@ -18,7 +18,6 @@ public class MetricService implements Serializable {
     private String metricDescription;
     private String outputExample;
 
-
     public UUID getIdService() {
         return idService;
     }
@@ -49,5 +48,29 @@ public class MetricService implements Serializable {
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public String getMetricFormat() {
+        return metricFormat;
+    }
+
+    public void setMetricFormat(String metricFormat) {
+        this.metricFormat = metricFormat;
+    }
+
+    public String getMetricDescription() {
+        return metricDescription;
+    }
+
+    public void setMetricDescription(String metricDescription) {
+        this.metricDescription = metricDescription;
+    }
+
+    public String getOutputExample() {
+        return outputExample;
+    }
+
+    public void setOutputExample(String outputExample) {
+        this.outputExample = outputExample;
     }
 }
