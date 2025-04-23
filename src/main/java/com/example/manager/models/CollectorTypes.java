@@ -9,8 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "TB_COLLECTORS_TYPES")
-public class CollectorsTypes implements Serializable{
+@Table(name = "TB_COLLECTOR_TYPES")
+public class CollectorTypes implements Serializable{
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idType;
