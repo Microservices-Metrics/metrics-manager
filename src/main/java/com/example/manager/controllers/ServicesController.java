@@ -6,7 +6,7 @@ import com.example.manager.repositories.IMetricServiceRepository;
 
 import jakarta.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +23,9 @@ public class ServicesController {
 
     @Autowired
     IMetricServiceRepository metricServiceRepository;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<List<MetricService>> getAllMetricServices() {
@@ -41,10 +44,13 @@ public class ServicesController {
 
     @PostMapping
     public ResponseEntity<MetricService> createServiceMetric(@RequestBody MetricServiceDto metricServiceDto) {
-        var metricService = new MetricService();
-
-        BeanUtils.copyProperties(metricServiceDto, metricService);
-
+        MetricService metricService = modelMapper.map(metricServiceDto, MetricService.class);
+        
+        // Definir a relação bidirecional para os argumentos
+        if (metricService.getArguments() != null) {
+            metricService.getArguments().forEach(arg -> arg.setMetricService(metricService));
+        }
+        
         return ResponseEntity.status(HttpStatus.CREATED).body(metricServiceRepository.save(metricService));
     }
 
@@ -56,10 +62,8 @@ public class ServicesController {
         if (metricService.isEmpty())
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Metric Service not found!");
 
-        var updatedMetricService = metricService.get();
-        
-        BeanUtils.copyProperties(metricServiceDto, updatedMetricService);
-
+        MetricService updatedMetricService = modelMapper.map(metricServiceDto, MetricService.class);
+        updatedMetricService.setIdService(idService);
         return ResponseEntity.status(HttpStatus.OK).body(metricServiceRepository.save(updatedMetricService));
     }
 

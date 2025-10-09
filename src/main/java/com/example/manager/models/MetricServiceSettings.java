@@ -1,8 +1,11 @@
-package com.example.manager.dtos;
+
+package com.example.manager.models;
 
 import java.sql.Date;
+import jakarta.persistence.Embeddable;
 
-public class MetricServiceSettingsDto {
+@Embeddable
+public class MetricServiceSettings {
     private String cronExpression;
     private Date startDate;
     private Date endDate;
@@ -10,7 +13,7 @@ public class MetricServiceSettingsDto {
     public String getCronExpression() {
         return cronExpression;
     }
-
+    
     public void setCronExpression(String cronExpression) {
         this.cronExpression = cronExpression;
     }

@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "TB_COLLECTOR_TYPES")
-public class CollectorTypes implements Serializable{
+public class CollectorTypes implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idType;
