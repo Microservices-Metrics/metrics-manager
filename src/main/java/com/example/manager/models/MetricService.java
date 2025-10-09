@@ -25,12 +25,23 @@ public class MetricService implements Serializable {
     @OneToMany(mappedBy = "metricService", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<MetricServiceArguments> arguments = new ArrayList<>();
     
+    @OneToMany(mappedBy = "metricService", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MetricServiceExecution> executions = new ArrayList<>();
+    
     public List<MetricServiceArguments> getArguments() {
         return arguments;
     }
     
     public void setArguments(List<MetricServiceArguments> arguments) {
         this.arguments = arguments;
+    }
+    
+    public List<MetricServiceExecution> getExecutions() {
+        return executions;
+    }
+
+    public void setExecutions(List<MetricServiceExecution> executions) {
+        this.executions = executions;
     }
     
     public UUID getIdService() {

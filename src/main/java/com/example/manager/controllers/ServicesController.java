@@ -3,6 +3,7 @@ package com.example.manager.controllers;
 import com.example.manager.dtos.MetricServiceDto;
 import com.example.manager.models.MetricService;
 import com.example.manager.repositories.IMetricServiceRepository;
+import com.example.manager.services.MetricSchedulingService;
 
 import jakarta.validation.Valid;
 
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,10 @@ public class ServicesController {
 
     @Autowired
     IMetricServiceRepository metricServiceRepository;
+
+    @Autowired
+    private MetricSchedulingService metricSchedulingService;
+
 
     @Autowired
     private ModelMapper modelMapper;
@@ -44,14 +50,9 @@ public class ServicesController {
 
     @PostMapping
     public ResponseEntity<MetricService> createServiceMetric(@RequestBody MetricServiceDto metricServiceDto) {
-        MetricService metricService = modelMapper.map(metricServiceDto, MetricService.class);
+        MetricService metricService = metricSchedulingService.createMetricServiceAndSchedule(metricServiceDto);
         
-        // Definir a relação bidirecional para os argumentos
-        if (metricService.getArguments() != null) {
-            metricService.getArguments().forEach(arg -> arg.setMetricService(metricService));
-        }
-        
-        return ResponseEntity.status(HttpStatus.CREATED).body(metricServiceRepository.save(metricService));
+        return ResponseEntity.status(HttpStatus.CREATED).body(metricService);
     }
 
     @PutMapping("/{id}")
@@ -63,11 +64,14 @@ public class ServicesController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Metric Service not found!");
 
         MetricService updatedMetricService = modelMapper.map(metricServiceDto, MetricService.class);
+        
         updatedMetricService.setIdService(idService);
+        
         return ResponseEntity.status(HttpStatus.OK).body(metricServiceRepository.save(updatedMetricService));
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Object> deleteServiceMetric(@PathVariable(value="id") UUID idService) {
         Optional<MetricService> metricService = metricServiceRepository.findById(idService);
 
@@ -75,7 +79,7 @@ public class ServicesController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Metric Service not found!");
 
         metricServiceRepository.delete(metricService.get());
-        
+
         return ResponseEntity.status(HttpStatus.OK).body("Metric Service deleted!");
     }
 }
