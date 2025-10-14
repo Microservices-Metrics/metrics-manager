@@ -13,43 +13,51 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Varre a fila de execuções agendadas e dispara requisições HTTP para serviços de coleta.
- * Estratégia simples: a cada minuto pega até 50 execuções vencidas não processadas.
+ * Varre a fila de execuções agendadas e dispara requisições HTTP para serviços
+ * de coleta.
+ * Estratégia simples: a cada minuto pega até 50 execuções vencidas não
+ * processadas.
  */
 @Component
 public class MetricExecutionRunner {
     private static final Logger log = LoggerFactory.getLogger(MetricExecutionRunner.class);
+    private static final ObjectMapper objectMapper = new ObjectMapper();
 
     @Autowired
     private IMetricServiceExecutionRepository executionRepository;
     @Autowired
     private RestTemplate restTemplate;
 
-    // Intervalo: a cada 1 minuto (ajustável). Usa cron para facilidade de leitura.
-    @Scheduled(cron = "0 */1 * * * *")
+    // Intervalo: a cada 5 minutos (ajustável). Usa cron para facilidade de leitura.
+    @Scheduled(cron = "0 */5 * * * *")
     @Transactional
     public void processDueExecutions() {
         LocalDateTime now = LocalDateTime.now();
         List<MetricServiceExecutions> due = executionRepository
                 .findTop50ByResponseStatusIsNullAndStartDateTimeBeforeOrderByStartDateTimeAsc(now);
-        if (due.isEmpty()) return;
+        if (due.isEmpty())
+            return;
 
-        log.debug("Processando {} execuções agendadas vencidas", due.size());
+        log.info("Processando {} execuções agendadas vencidas", due.size());
 
         for (MetricServiceExecutions execution : due) {
             try {
                 performExecution(execution);
             } catch (Exception ex) {
-                log.error("Falha ao executar serviço {} execId={}", execution.getMetricService().getIdService(), execution.getIdExecution(), ex);
+                log.error("Falha ao executar serviço {} execId={}", execution.getMetricService().getIdService(),
+                        execution.getIdExecution(), ex);
                 execution.setEndDateTime(LocalDateTime.now());
                 execution.setResponseStatus(599); // Código sintético para erro interno de coleta
-                execution.setResponseBody(truncate("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), 8000));
+                execution.setResponseBody(
+                        truncate("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), 8000));
             }
         }
     }
@@ -57,22 +65,38 @@ public class MetricExecutionRunner {
     private void performExecution(MetricServiceExecutions execution) {
         MetricService service = execution.getMetricService();
         String url = service.getUrl();
-        // Monta corpo simples JSON com arguments (nome -> placeholder tipo)
+
+        // Monta corpo simples JSON com arguments (nome -> argumentValue ou placeholder por type)
         Map<String, Object> bodyMap = Optional.ofNullable(service.getArguments())
                 .orElseGet(List::of)
                 .stream()
-                .collect(Collectors.toMap(MetricServiceArguments::getArgumentName, a -> defaultValueForType(a.getType()), (a,b) -> b));
+                .collect(Collectors.toMap(MetricServiceArguments::getArgumentName,
+                        a -> {
+                            String v = a.getArgumentValue();
+                            return v != null ? parseValueForType(v, a.getType()) : defaultValueForType(a.getType());
+                        }, (a, b) -> b));
 
-        String requestBody = bodyMap.isEmpty() ? null : bodyMap.toString();
+        String requestBody;
+
+        if (bodyMap.isEmpty()) {
+            requestBody = null;
+        } else {
+            try {
+                requestBody = objectMapper.writeValueAsString(bodyMap);
+            } catch (JsonProcessingException e) {
+                log.warn("Falha ao serializar bodyMap para JSON, usando fallback toString()", e);
+                requestBody = bodyMap.toString();
+            }
+        }
         execution.setRequestBody(requestBody);
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
-    ResponseEntity<String> response;
+        ResponseEntity<String> response;
         try {
-            response = restTemplate.exchange(url, HttpMethod.GET, entity, String.class); // GET por padrão; poderia ajustar pelo 'type'
+            response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class); // POST por padrão; poderia ajustar pelo 'type'
         } catch (RestClientException ex) {
             execution.setEndDateTime(LocalDateTime.now());
             execution.setResponseStatus(599);
@@ -85,7 +109,8 @@ public class MetricExecutionRunner {
     }
 
     private Object defaultValueForType(String type) {
-        if (type == null) return null;
+        if (type == null)
+            return null;
         return switch (type.toLowerCase()) {
             case "inteiro", "integer", "int" -> 0;
             case "decimal", "double", "float" -> 0.0;
@@ -95,8 +120,37 @@ public class MetricExecutionRunner {
         };
     }
 
+    private Object parseValueForType(String value, String type) {
+        if (value == null)
+            return defaultValueForType(type);
+        if (type == null)
+            return value;
+        try {
+            return switch (type.toLowerCase()) {
+                case "inteiro", "integer", "int" -> Integer.parseInt(value);
+                case "decimal", "double", "float" -> Double.parseDouble(value);
+                case "datahora", "datetime" -> {
+                    try {
+                        LocalDateTime dt = LocalDateTime.parse(value);
+                        yield dt.toString();
+                    } catch (Exception e) {
+                        // keep original string if parsing fails
+                        yield value;
+                    }
+                }
+                case "texto", "string" -> value;
+                default -> value;
+            };
+        } catch (Exception ex) {
+            log.debug("parseValueForType: failed to parse '{}' as {} -> returning original/string default", value,
+                    type);
+            return value;
+        }
+    }
+
     private String truncate(String s, int max) {
-        if (s == null) return null;
+        if (s == null)
+            return null;
         return s.length() <= max ? s : s.substring(0, max);
     }
 }

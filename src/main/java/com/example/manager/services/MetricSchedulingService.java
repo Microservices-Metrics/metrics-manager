@@ -18,6 +18,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Responsável por criar um MetricService e gerar sua agenda de execuções futuras.
@@ -26,6 +28,7 @@ import java.util.List;
 public class MetricSchedulingService {
 
     private static final int MAX_SCHEDULE_ENTRIES = 1000; // Limita para evitar explosões acidentais
+    private static final Logger log = LoggerFactory.getLogger(MetricSchedulingService.class);
 
     @Autowired
     private IMetricServiceRepository metricServiceRepository;
@@ -38,6 +41,7 @@ public class MetricSchedulingService {
 
     @Transactional
     public MetricService createMetricServiceAndSchedule(MetricServiceDto dto) {
+        log.debug("Iniciando createMetricServiceAndSchedule para service.name={}", dto.getName());
         MetricService metricService = modelMapper.map(dto, MetricService.class);
 
         // Ajusta relação bidirecional
@@ -50,7 +54,12 @@ public class MetricSchedulingService {
         metricService = metricServiceRepository.save(metricService);
 
         // Gerar agenda de execuções
-        generateExecutions(metricService);
+        try {
+            generateExecutions(metricService);
+        } catch (Exception ex) {
+            // Não queremos quebrar a criação por causa de problema de schedule — logamos para investigação
+            log.error("Erro ao gerar agenda para metricService.id={} name={}", metricService.getIdService(), metricService.getName(), ex);
+        }
 
         return metricService;
     }
@@ -58,6 +67,7 @@ public class MetricSchedulingService {
     private void generateExecutions(MetricService metricService) {
         MetricServiceSettings settings = metricService.getCollectionSettings();
         if (settings == null || settings.getCronExpression() == null || settings.getStartDate() == null || settings.getEndDate() == null) {
+            log.debug("generateExecutions: configurações incompletas para metricService.id={} -> não há agenda a gerar", metricService.getIdService());
             return; // Nada a agendar
         }
 
@@ -78,11 +88,12 @@ public class MetricSchedulingService {
             cron = CronExpression.parse(cronNormalized);
         } catch (IllegalArgumentException ex) {
             // Cron inválido ou não permitido -> não gera agenda
+            log.warn("Expressão cron inválida para metricService.id={} cron='{}' -> pulando geração: {}", metricService.getIdService(), settings.getCronExpression(), ex.getMessage());
             return;
         }
 
-        LocalDate startDate = settings.getStartDate().toLocalDate();
-        LocalDate endDate = settings.getEndDate().toLocalDate();
+        LocalDate startDate = settings.getStartDate();
+        LocalDate endDate = settings.getEndDate();
         if (endDate.isBefore(startDate)) return;
 
         LocalDateTime windowStart = startDate.atStartOfDay();
@@ -105,6 +116,9 @@ public class MetricSchedulingService {
 
         if (!executions.isEmpty()) {
             metricServiceExecutionRepository.saveAll(executions);
+            log.info("generateExecutions: {} execuções criadas para metricService.id={}", executions.size(), metricService.getIdService());
+        } else {
+            log.debug("generateExecutions: nenhuma execução gerada para metricService.id={}", metricService.getIdService());
         }
     }
 

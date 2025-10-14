@@ -5,16 +5,16 @@ import java.util.List;
 import jakarta.validation.constraints.NotBlank;
 
 public class MetricServiceDto {
-    @NotBlank 
+    @NotBlank
     private String name;
-    @NotBlank 
+    @NotBlank
     private String type;
-    @NotBlank 
+    @NotBlank
     private String url;
     private MetricServiceSettingsDto collectionSettings;
-    @NotBlank 
+    @NotBlank
     private String metricFormat;
-    @NotBlank 
+    @NotBlank
     private String metricDescription;
     private String outputExample;
     private List<MetricServiceArgumentsDto> arguments;
