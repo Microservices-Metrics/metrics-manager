@@ -3,7 +3,7 @@ package com.example.manager.services;
 import com.example.manager.dtos.MetricServiceDto;
 import com.example.manager.models.MetricService;
 import com.example.manager.models.MetricServiceArguments;
-import com.example.manager.models.MetricServiceExecution;
+import com.example.manager.models.MetricServiceExecutions;
 import com.example.manager.models.MetricServiceSettings;
 import com.example.manager.repositories.IMetricServiceExecutionRepository;
 import com.example.manager.repositories.IMetricServiceRepository;
@@ -25,12 +25,14 @@ import java.util.List;
 @Service
 public class MetricSchedulingService {
 
-    private static final int MAX_SCHEDULE_ENTRIES = 1000; // Evita explosões acidentais
+    private static final int MAX_SCHEDULE_ENTRIES = 1000; // Limita para evitar explosões acidentais
 
     @Autowired
     private IMetricServiceRepository metricServiceRepository;
+
     @Autowired
     private IMetricServiceExecutionRepository metricServiceExecutionRepository;
+
     @Autowired
     private ModelMapper modelMapper;
 
@@ -88,10 +90,10 @@ public class MetricSchedulingService {
 
         LocalDateTime next = cron.next(windowStart.minusSeconds(1));
 
-        List<MetricServiceExecution> executions = new ArrayList<>();
+        List<MetricServiceExecutions> executions = new ArrayList<>();
         int count = 0;
         while (next != null && !next.isAfter(windowEnd) && count < MAX_SCHEDULE_ENTRIES) {
-            MetricServiceExecution exec = new MetricServiceExecution();
+            MetricServiceExecutions exec = new MetricServiceExecutions();
             exec.setMetricService(metricService);
             exec.setStartDateTime(next);
             exec.setRequestUrl(metricService.getUrl());

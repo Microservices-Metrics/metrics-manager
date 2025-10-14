@@ -1,5 +1,6 @@
 package com.example.manager.models;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -7,29 +8,29 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Entity
-@Table(name = "TB_METRIC_SERVICE_EXECUTION")
-public class MetricServiceExecution implements Serializable {
+@Table(name = "TB_METRIC_SERVICE_EXECUTIONS")
+public class MetricServiceExecutions implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idExecution;
 
     @ManyToOne(optional = false, fetch = FetchType.LAZY)
     @JoinColumn(name = "id_metric_service", nullable = false)
+    @JsonBackReference("service-executions")
     private MetricService metricService;
 
-    // Data/hora prevista para iniciar a execução (agenda)
+    // Data/hora prevista para iniciar a execução agendada
     private LocalDateTime startDateTime;
-    // Data/hora real de fim (preenchida após execução)
+
+    // Data/hora real de fim (será preenchida após execução do Runner)
     private LocalDateTime endDateTime;
 
     private String requestUrl;
 
-    @Lob
     private String requestBody;
 
     private Integer responseStatus;
 
-    @Lob
     private String responseBody;
 
     public UUID getIdExecution() {

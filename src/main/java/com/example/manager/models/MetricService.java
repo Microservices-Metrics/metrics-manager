@@ -1,5 +1,6 @@
 package com.example.manager.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -23,10 +24,12 @@ public class MetricService implements Serializable {
     private String outputExample;
     
     @OneToMany(mappedBy = "metricService", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("service-arguments")
     private List<MetricServiceArguments> arguments = new ArrayList<>();
     
     @OneToMany(mappedBy = "metricService", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<MetricServiceExecution> executions = new ArrayList<>();
+    @JsonManagedReference("service-executions")
+    private List<MetricServiceExecutions> executions = new ArrayList<>();
     
     public List<MetricServiceArguments> getArguments() {
         return arguments;
@@ -36,11 +39,11 @@ public class MetricService implements Serializable {
         this.arguments = arguments;
     }
     
-    public List<MetricServiceExecution> getExecutions() {
+    public List<MetricServiceExecutions> getExecutions() {
         return executions;
     }
 
-    public void setExecutions(List<MetricServiceExecution> executions) {
+    public void setExecutions(List<MetricServiceExecutions> executions) {
         this.executions = executions;
     }
     

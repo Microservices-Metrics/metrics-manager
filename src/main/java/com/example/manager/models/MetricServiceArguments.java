@@ -3,7 +3,7 @@ package com.example.manager.models;
 import java.io.Serializable;
 import java.util.UUID;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -20,12 +20,13 @@ public class MetricServiceArguments implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idArgument;
     private String argumentName;
-    private String type; // 'inteiro', 'decimal', 'datahora', 'texto'
+    private String argumentValue;
+    private String type;
     private String description;
     
     @ManyToOne
     @JoinColumn(name = "id_metric_service", nullable = false)
-    @JsonIgnore
+    @JsonBackReference(value = "service-arguments")
     private MetricService metricService;
     
     public MetricService getMetricService() {
@@ -35,6 +36,7 @@ public class MetricServiceArguments implements Serializable {
     public void setMetricService(MetricService metricService) {
         this.metricService = metricService;
     }
+
     public UUID getIdArgument() {
         return idArgument;
     }
@@ -42,10 +44,19 @@ public class MetricServiceArguments implements Serializable {
     public String getArgumentName() {
         return argumentName;
     }
+    
     public void setArgumentName(String argumentName) {
         this.argumentName = argumentName;
     }
     
+    public String getArgumentValue() {
+        return argumentValue;
+    }
+
+    public void setArgumentValue(String argumentValue) {
+        this.argumentValue = argumentValue;
+    }
+
     public String getType() {
         return type;
     }

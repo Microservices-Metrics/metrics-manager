@@ -2,7 +2,7 @@ package com.example.manager.services;
 
 import com.example.manager.models.MetricService;
 import com.example.manager.models.MetricServiceArguments;
-import com.example.manager.models.MetricServiceExecution;
+import com.example.manager.models.MetricServiceExecutions;
 import com.example.manager.repositories.IMetricServiceExecutionRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,13 +36,13 @@ public class MetricExecutionRunner {
     @Transactional
     public void processDueExecutions() {
         LocalDateTime now = LocalDateTime.now();
-        List<MetricServiceExecution> due = executionRepository
+        List<MetricServiceExecutions> due = executionRepository
                 .findTop50ByResponseStatusIsNullAndStartDateTimeBeforeOrderByStartDateTimeAsc(now);
         if (due.isEmpty()) return;
 
         log.debug("Processando {} execuções agendadas vencidas", due.size());
 
-        for (MetricServiceExecution execution : due) {
+        for (MetricServiceExecutions execution : due) {
             try {
                 performExecution(execution);
             } catch (Exception ex) {
@@ -54,7 +54,7 @@ public class MetricExecutionRunner {
         }
     }
 
-    private void performExecution(MetricServiceExecution execution) {
+    private void performExecution(MetricServiceExecutions execution) {
         MetricService service = execution.getMetricService();
         String url = service.getUrl();
         // Monta corpo simples JSON com arguments (nome -> placeholder tipo)

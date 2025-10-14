@@ -5,13 +5,26 @@ import jakarta.validation.constraints.NotBlank;
 public class MetricServiceArgumentsDto {
     @NotBlank 
     private String argumentName;
+    
+    @NotBlank
+    private String argumentValue;
+    
     @NotBlank 
     private String type;
+    
     @NotBlank 
     private String description;
-
+    
     public String getArgumentName() {
         return argumentName;
+    }
+    
+    public String getArgumentValue() {
+        return argumentValue;
+    }
+
+    public void setArgumentValue(String argumentValue) {
+        this.argumentValue = argumentValue;
     }
 
     public void setArgumentName(String argumentName) {

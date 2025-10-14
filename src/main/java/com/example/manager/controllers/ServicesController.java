@@ -29,7 +29,6 @@ public class ServicesController {
     @Autowired
     private MetricSchedulingService metricSchedulingService;
 
-
     @Autowired
     private ModelMapper modelMapper;
 
@@ -82,4 +81,16 @@ public class ServicesController {
 
         return ResponseEntity.status(HttpStatus.OK).body("Metric Service deleted!");
     }
+
+    @DeleteMapping
+    @Transactional
+    public ResponseEntity<List<UUID>> deleteAllServiceMetrics() {
+        List<MetricService> allServices = metricServiceRepository.findAll();
+
+        metricServiceRepository.deleteAll();
+
+        // TODO: retornar UUIDs dentro de uma propriedade chamada "deletedMetricsServicesIds"
+        return ResponseEntity.status(HttpStatus.OK).body(allServices.stream().map(MetricService::getIdService).toList());
+    }
+
 }

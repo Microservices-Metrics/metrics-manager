@@ -1,6 +1,6 @@
 package com.example.manager.repositories;
 
-import com.example.manager.models.MetricServiceExecution;
+import com.example.manager.models.MetricServiceExecutions;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -9,8 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
-public interface IMetricServiceExecutionRepository extends JpaRepository<MetricServiceExecution, UUID> {
-    List<MetricServiceExecution> findByMetricService_IdService(UUID idService);
+public interface IMetricServiceExecutionRepository extends JpaRepository<MetricServiceExecutions, UUID> {
+    List<MetricServiceExecutions> findByMetricService_IdService(UUID idService);
     // Busca execuções vencidas ainda não processadas (sem responseStatus) limitando manualmente depois
-    List<MetricServiceExecution> findTop50ByResponseStatusIsNullAndStartDateTimeBeforeOrderByStartDateTimeAsc(LocalDateTime now);
+    List<MetricServiceExecutions> findTop50ByResponseStatusIsNullAndStartDateTimeBeforeOrderByStartDateTimeAsc(LocalDateTime now);
 }
