@@ -62,6 +62,23 @@ public class MetricExecutionRunner {
         }
     }
 
+    @Transactional
+    public MetricServiceExecutions runExecution(MetricServiceExecutions execution) {
+        // Certifique-se de que o objeto esteja gerenciado/atualizado pelo repositório
+        try {
+            performExecution(execution);
+        } catch (Exception ex) {
+            log.error("runExecution: erro ao executar execId={}", execution.getIdExecution(), ex);
+            execution.setEndDateTime(LocalDateTime.now());
+            execution.setResponseStatus(599);
+            execution.setResponseBody(truncate("ERROR: " + ex.getClass().getSimpleName() + " - " + ex.getMessage(), 8000));
+        }
+
+        // Persiste a coleta após execução
+        executionRepository.save(execution);
+        return execution;
+    }
+
     private void performExecution(MetricServiceExecutions execution) {
         MetricService service = execution.getMetricService();
         String url = service.getUrl();
@@ -95,6 +112,7 @@ public class MetricExecutionRunner {
         HttpEntity<String> entity = new HttpEntity<>(requestBody, headers);
 
         ResponseEntity<String> response;
+        
         try {
             response = restTemplate.exchange(url, HttpMethod.POST, entity, String.class); // POST por padrão; poderia ajustar pelo 'type'
         } catch (RestClientException ex) {
@@ -103,6 +121,7 @@ public class MetricExecutionRunner {
             execution.setResponseBody(truncate("REST_ERROR: " + ex.getMessage(), 8000));
             return;
         }
+        
         execution.setEndDateTime(LocalDateTime.now());
         execution.setResponseStatus(response.getStatusCode().value());
         execution.setResponseBody(truncate(response.getBody(), 16000));
@@ -129,6 +148,7 @@ public class MetricExecutionRunner {
             return switch (type.toLowerCase()) {
                 case "inteiro", "integer", "int" -> Integer.parseInt(value);
                 case "decimal", "double", "float" -> Double.parseDouble(value);
+                case "boolean", "bool" -> Boolean.parseBoolean(value);
                 case "datahora", "datetime" -> {
                     try {
                         LocalDateTime dt = LocalDateTime.parse(value);
