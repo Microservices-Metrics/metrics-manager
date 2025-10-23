@@ -18,7 +18,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-// TODO: criar camada Service
 @RestController
 @RequestMapping("/services")
 public class ServicesController {
