@@ -4,6 +4,7 @@ import java.util.List;
 
 import jakarta.validation.constraints.NotBlank;
 
+// TODO: deletar!
 public class MetricServiceDto {
     @NotBlank
     private String name;

@@ -2,6 +2,7 @@ package com.example.manager.dtos;
 
 import java.time.LocalDate;
 
+// TODO: deletar!
 public class MetricServiceSettingsDto {
     private String cronExpression;
     private LocalDate startDate;

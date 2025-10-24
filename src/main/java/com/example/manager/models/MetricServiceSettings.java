@@ -4,6 +4,8 @@ package com.example.manager.models;
 import java.time.LocalDate;
 import jakarta.persistence.Embeddable;
 
+
+// TODO: deletar
 @Embeddable
 public class MetricServiceSettings {
     private String cronExpression;

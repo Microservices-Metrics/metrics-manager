@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
+// TODO: deletar
 @Entity
 @Table(name = "TB_METRIC_SERVICE_ARGUMENTS")
 public class MetricServiceArguments implements Serializable {

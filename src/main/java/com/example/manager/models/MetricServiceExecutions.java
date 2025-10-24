@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
+// TODO: deletar
 @Entity
 @Table(name = "TB_METRIC_SERVICE_EXECUTIONS")
 public class MetricServiceExecutions implements Serializable {

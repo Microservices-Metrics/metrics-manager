@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+
+// TODO: deletar!
 @Entity
 @Table(name = "TB_METRIC_SERVICE")
 public class MetricService implements Serializable {

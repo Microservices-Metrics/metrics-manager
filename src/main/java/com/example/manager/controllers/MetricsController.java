@@ -42,7 +42,7 @@ public class MetricsController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MetricDto> getMetricById(@PathVariable("id") UUID id) {
+    public ResponseEntity<MetricDto> getMetricById(@PathVariable UUID id) {
         Optional<Metric> metricOpt = metricRepository.findById(id);
         if (metricOpt.isEmpty()) {
             return ResponseEntity.notFound().build();
