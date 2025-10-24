@@ -13,11 +13,13 @@ docker-compose up --build
 A aplicação estará disponível em `http://localhost:8080`
 
 Para parar:
+
 ```bash
 docker-compose down
 ```
 
 Para parar e remover volumes (limpa o banco):
+
 ```bash
 docker-compose down -v
 ```
@@ -25,11 +27,13 @@ docker-compose down -v
 ### Opção 2: Docker Build Manual
 
 Build da imagem:
+
 ```bash
 docker build -t metric-manager:latest .
 ```
 
 Executar (certifique-se que o PostgreSQL está rodando):
+
 ```bash
 docker run -p 8080:8080 \
   -e SPRING_DATASOURCE_URL=jdbc:postgresql://host.docker.internal:5432/microservices-metrics-db \
@@ -55,11 +59,13 @@ docker run -p 8080:8080 \
 ## Logs
 
 Para ver os logs da aplicação:
+
 ```bash
 docker-compose logs -f app
 ```
 
 Para ver logs do PostgreSQL:
+
 ```bash
 docker-compose logs -f postgres
 ```

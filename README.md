@@ -4,12 +4,14 @@ Sistema de gerenciamento de métricas para microserviços, desenvolvido com Spri
 
 ## 📋 Pré-requisitos
 
-### Para rodar sem Docker:
+### Para rodar sem Docker
+
 - Java 17 ou superior
 - Maven 3.6+
 - PostgreSQL 12+
 
-### Para rodar com Docker:
+### Para rodar com Docker
+
 - Docker 20.10+
 - Docker Compose 2.0+
 
@@ -76,7 +78,7 @@ spring.datasource.password=123
 
 #### 3. Execute a aplicação
 
-**Opção A: Usando Maven Wrapper**
+##### Opção A: Usando Maven Wrapper
 
 ```bash
 # Linux/Mac
@@ -86,7 +88,7 @@ spring.datasource.password=123
 mvnw.cmd spring-boot:run
 ```
 
-**Opção B: Compilar e executar o JAR**
+##### Opção B: Compilar e executar o JAR
 
 ```bash
 # Compilar
@@ -96,7 +98,7 @@ mvnw.cmd spring-boot:run
 java -jar target/*.jar
 ```
 
-**Opção C: Via IDE**
+##### Opção C: Via IDE
 
 Execute a classe principal: `com.example.manager.ManagerApplication`
 
