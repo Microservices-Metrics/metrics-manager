@@ -7,7 +7,10 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
 @Table(name = "TB_COLLECTOR")
@@ -18,7 +21,10 @@ public class Collector implements Serializable {
     private String name;
     private String description;
     private String collectionMethod;
-    private UUID metricId; // TODO: Relacionar com a entidade Metric (ManyToOne)
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_metric", nullable = false)
+    @JsonBackReference("metric-collectors")
+    private Metric metric;
     private String url;
     private String requestSchema;
     private String pathToMetric;
@@ -56,11 +62,15 @@ public class Collector implements Serializable {
     }
 
     public UUID getMetricId() {
-        return metricId;
+        return metric != null ? metric.getIdMetric() : null;
     }
 
-    public void setMetricId(UUID metricId) {
-        this.metricId = metricId;
+    public Metric getMetric() {
+        return metric;
+    }
+
+    public void setMetric(Metric metric) {
+        this.metric = metric;
     }
 
     public String getUrl() {

@@ -8,6 +8,10 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.OneToMany;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "TB_METRIC")
@@ -19,6 +23,10 @@ public class Metric implements Serializable {
     private String description;
     private String type;
     private String unit;
+    
+    @OneToMany(mappedBy = "metric", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("metric-collectors")
+    private List<Collector> collectors = new ArrayList<>();
     
     public UUID getIdMetric() {
         return idMetric;
@@ -58,5 +66,13 @@ public class Metric implements Serializable {
 
     public void setUnit(String unit) {
         this.unit = unit;
+    }
+
+    public List<Collector> getCollectors() {
+        return collectors;
+    }
+
+    public void setCollectors(List<Collector> collectors) {
+        this.collectors = collectors;
     }
 }
