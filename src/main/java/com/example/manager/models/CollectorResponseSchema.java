@@ -8,16 +8,62 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.JoinColumn;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@Table(name = "TB_COLLECTOR_RESPONSE_SCHEMA")
+@Table(name = "TB_COLLECTOR_RESPONSE_SCHEMAS")
 public class CollectorResponseSchema implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-
-    private UUID idCollector;
+    
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "id_collector", nullable = false)
+    @JsonBackReference("collector-response-schemas")
+    private Collector collector;
     private String schema;
     private int statusCode;
     private String description;
+    
+    public Collector getCollector() {
+        return collector;
+    }
+
+    public void setCollector(Collector collector) {
+        this.collector = collector;
+    }
+    
+    public String getSchema() {
+        return schema;
+    }
+    
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
+    
+    public int getStatusCode() {
+        return statusCode;
+    }
+    
+    public void setStatusCode(int statusCode) {
+        this.statusCode = statusCode;
+    }
+    
+    public String getDescription() {
+        return description;
+    }
+    
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public void setId(UUID id) {
+        this.id = id;
+    }
 }
