@@ -1,34 +1,39 @@
 package com.example.manager.models;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.UUID;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-
 @Entity
-@Table(name = "TB_COLLECTION")
-public class Collection implements Serializable {
+@Table(name = "TB_COLLECTOR_CONFIGS")
+public class CollectorConfig implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_collector", nullable = false)
-    @JsonBackReference("collector-collections")
+    @JsonBackReference("collector-configs")
     private Collector collector;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_microservice", nullable = false)
-    @JsonBackReference("microservice-collections")
+    @JsonBackReference("collector-configs")
     private Microservice microservice;
+
+    private String cronExpression;
+    private LocalDateTime startDateTime;
+    private LocalDateTime endDateTime;
 
     public UUID getId() {
         return id;
@@ -36,6 +41,30 @@ public class Collection implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
+    }
+
+    public String getCronExpression() {
+        return cronExpression;
+    }
+
+    public void setCronExpression(String cronExpression) {
+        this.cronExpression = cronExpression;
+    }
+
+    public LocalDateTime getStartDateTime() {
+        return startDateTime;
+    }
+
+    public void setStartDateTime(LocalDateTime startDateTime) {
+        this.startDateTime = startDateTime;
+    }
+
+    public LocalDateTime getEndDateTime() {
+        return endDateTime;
+    }
+
+    public void setEndDateTime(LocalDateTime endDateTime) {
+        this.endDateTime = endDateTime;
     }
 
     public Collector getCollector() {

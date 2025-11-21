@@ -26,21 +26,29 @@ public class Collector implements Serializable {
     private String name;
     private String description;
     private String collectionMethod;
+
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_metric", nullable = false)
     @JsonBackReference("metric-collectors")
     private Metric metric;
-    private String url;
-    private String requestSchema;
-    private String pathToMetric;
 
     @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("collector-response-schemas")
     private List<CollectorResponseSchema> responseSchemas = new ArrayList<>();
 
     @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("collector-collections")
-    private List<Collection> collections = new ArrayList<>();
+    @JsonManagedReference("collector-metadata")
+    private List<CollectorMetadata> metadata = new ArrayList<>();
+
+    // TODO: preciso dos getters e setters?
+    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("collector-configs")
+    private List<CollectorConfig> configs = new ArrayList<>();
+
+    
+    // @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
+    // @JsonManagedReference("collector-collections")
+    // private List<Collection> collections = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -86,43 +94,11 @@ public class Collector implements Serializable {
         this.metric = metric;
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getRequestSchema() {
-        return requestSchema;
-    }
-
-    public void setRequestSchema(String requestSchema) {
-        this.requestSchema = requestSchema;
-    }
-
-    public String getPathToMetric() {
-        return pathToMetric;
-    }
-
-    public void setPathToMetric(String pathToMetric) {
-        this.pathToMetric = pathToMetric;
-    }
-
     public List<CollectorResponseSchema> getResponseSchemas() {
         return responseSchemas;
     }
 
     public void setResponseSchemas(List<CollectorResponseSchema> responseSchemas) {
         this.responseSchemas = responseSchemas;
-    }
-
-    public List<Collection> getCollections() {
-        return collections;
-    }
-
-    public void setCollections(List<Collection> collections) {
-        this.collections = collections;
     }
 }

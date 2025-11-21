@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.manager.dtos.CollectionDto;
 import com.example.manager.dtos.CollectionRequestDto;
-import com.example.manager.models.Collection;
+import com.example.manager.models.Measurement;
 import com.example.manager.models.Collector;
 import com.example.manager.models.Microservice;
 import com.example.manager.repositories.ICollectionRepository;
@@ -46,7 +46,7 @@ public class CollectionsController {
 
     @GetMapping
     public ResponseEntity<List<CollectionDto>> getAllCollections() {
-        List<Collection> collections = collectionRepository.findAll();
+        List<Measurement> collections = collectionRepository.findAll();
         List<CollectionDto> dtos = collections.stream()
                 .map(c -> {
                     CollectionDto dto = modelMapper.map(c, CollectionDto.class);
@@ -80,14 +80,14 @@ public class CollectionsController {
         if (req.getMicroserviceId() != null && microservice == null)
             return ResponseEntity.badRequest().build();
 
-        Collection collection = new Collection();
+        Measurement collection = new Measurement();
         if (collector != null)
             collection.setCollector(collector);
 
         if (microservice != null)
             collection.setMicroservice(microservice);
 
-        Collection saved = collectionRepository.save(collection);
+        Measurement saved = collectionRepository.save(collection);
         CollectionDto dto = modelMapper.map(saved, CollectionDto.class);
         dto.setCollectorId(saved.getCollector() != null ? saved.getCollector().getId() : null);
         dto.setMicroserviceId(saved.getMicroservice() != null ? saved.getMicroservice().getId() : null);
@@ -120,7 +120,7 @@ public class CollectionsController {
             if (microservice != null)
                 existing.setMicroservice(microservice);
 
-            Collection saved = collectionRepository.save(existing);
+            Measurement saved = collectionRepository.save(existing);
             CollectionDto dto = modelMapper.map(saved, CollectionDto.class);
             dto.setCollectorId(saved.getCollector() != null ? saved.getCollector().getId() : null);
             dto.setMicroserviceId(saved.getMicroservice() != null ? saved.getMicroservice().getId() : null);

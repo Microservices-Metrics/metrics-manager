@@ -23,8 +23,9 @@ public class CollectorResponseSchema implements Serializable {
     @JoinColumn(name = "id_collector", nullable = false)
     @JsonBackReference("collector-response-schemas")
     private Collector collector;
+    
     private String schema;
-    private int statusCode;
+    private int statusType;
     private String description;
     
     public Collector getCollector() {
@@ -43,12 +44,12 @@ public class CollectorResponseSchema implements Serializable {
         this.schema = schema;
     }
     
-    public int getStatusCode() {
-        return statusCode;
+    public int getStatusType() {
+        return statusType;
     }
     
-    public void setStatusCode(int statusCode) {
-        this.statusCode = statusCode;
+    public void setStatusType(int statusType) {
+        this.statusType = statusType;
     }
     
     public String getDescription() {

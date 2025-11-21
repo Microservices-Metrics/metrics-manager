@@ -25,12 +25,12 @@ public class Microservice implements Serializable {
     private String name;
 
     @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("microservice-collections")
-    private List<Collection> collections = new ArrayList<>();
+    @JsonManagedReference("microservice-metadatas")
+    private List<MicroserviceMetadata> metadatas = new ArrayList<>();
 
     @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("microservice-metadatas")
-    private List<MicroserviceMetadatas> metadatas = new ArrayList<>();
+    @JsonManagedReference("collector-configs")
+    private List<CollectorConfig> collectorConfigs = new ArrayList<>();
 
     public UUID getId() {
         return id;
@@ -48,19 +48,19 @@ public class Microservice implements Serializable {
         this.name = name;
     }
 
-    public List<MicroserviceMetadatas> getMetadatas() {
+    public List<MicroserviceMetadata> getMetadatas() {
         return metadatas;
     }
 
-    public void setMetadatas(List<MicroserviceMetadatas> metadatas) {
-        this.metadatas = metadatas;
+    public void setMetadatas(List<MicroserviceMetadata> metadata) {
+        this.metadatas = metadata;
     }
 
-    public List<Collection> getCollections() {
-        return collections;
+    public List<CollectorConfig> getCollectorConfigs() {
+        return collectorConfigs;
     }
 
-    public void setCollections(List<Collection> collections) {
-        this.collections = collections;
+    public void setCollectorConfigs(List<CollectorConfig> collectorConfigs) {
+        this.collectorConfigs = collectorConfigs;
     }
 }

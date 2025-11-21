@@ -51,7 +51,7 @@ public class CollectorsController {
 						CollectorResponseSchemaDto rsDto = new CollectorResponseSchemaDto();
 						rsDto.setId(rs.getId());
 						rsDto.setSchema(rs.getSchema());
-						rsDto.setStatusCode(rs.getStatusCode());
+						rsDto.setStatusCode(rs.getStatusType());
 						rsDto.setDescription(rs.getDescription());
 						return rsDto;
 					}).collect(Collectors.toList()));
@@ -71,7 +71,7 @@ public class CollectorsController {
 						CollectorResponseSchemaDto rsDto = new CollectorResponseSchemaDto();
 						rsDto.setId(rs.getId());
 						rsDto.setSchema(rs.getSchema());
-						rsDto.setStatusCode(rs.getStatusCode());
+						rsDto.setStatusCode(rs.getStatusType());
 						rsDto.setDescription(rs.getDescription());
 						return rsDto;
 					}).collect(Collectors.toList()));
@@ -106,7 +106,7 @@ public class CollectorsController {
 			CollectorResponseSchemaDto rsDto = new CollectorResponseSchemaDto();
 			rsDto.setId(rs.getId());
 			rsDto.setSchema(rs.getSchema());
-			rsDto.setStatusCode(rs.getStatusCode());
+			rsDto.setStatusCode(rs.getStatusType());
 			rsDto.setDescription(rs.getDescription());
 			return rsDto;
 		}).collect(Collectors.toList()));
@@ -139,7 +139,7 @@ public class CollectorsController {
 				CollectorResponseSchemaDto rsDto = new CollectorResponseSchemaDto();
 				rsDto.setId(rs.getId());
 				rsDto.setSchema(rs.getSchema());
-				rsDto.setStatusCode(rs.getStatusCode());
+				rsDto.setStatusCode(rs.getStatusType());
 				rsDto.setDescription(rs.getDescription());
 				return rsDto;
 			}).collect(Collectors.toList()));

@@ -14,8 +14,8 @@ import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 @Entity
-@Table(name = "TB_MICROSERVICE_METADATAS")
-public class MicroserviceMetadatas implements Serializable {
+@Table(name = "TB_MICROSERVICE_METADATA")
+public class MicroserviceMetadata implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
