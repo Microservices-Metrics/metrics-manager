@@ -1,0 +1,66 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: metric-manager-postgres
+    environment:
+      POSTGRES_DB: microservices-metrics-db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - metric-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Configuração usando network_mode: host (Linux)
+  # A aplicação pode acessar localhost:* do host
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: metric-manager-app
+    network_mode: host
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/microservices-metrics-db
+      SPRING_DATASOURCE_USERNAME: postgres
+      SPRING_DATASOURCE_PASSWORD: 123
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # ALTERNATIVA para Windows/Mac (descomente e comente o serviço 'app' acima se network_mode: host não funcionar)
+  # app-windows:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   container_name: metric-manager-app
+  #   ports:
+  #     - "8080:8080"
+  #   environment:
+  #     SPRING_DATASOURCE_URL: jdbc:postgresql://host.docker.internal:5432/microservices-metrics-db
+  #     SPRING_DATASOURCE_USERNAME: postgres
+  #     SPRING_DATASOURCE_PASSWORD: 123
+  #     SPRING_JPA_HIBERNATE_DDL_AUTO: update
+  #   extra_hosts:
+  #     - "host.docker.internal:host-gateway"
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #   networks:
+  #     - metric-network
+
+volumes:
+  postgres_data:
+
+networks:
+  metric-network:
+    driver: bridge
