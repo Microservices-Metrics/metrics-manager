@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Entity
-@Table(name = "TB_METRIC")
+@Table(name = "TB_METRICS")
 public class Metric implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

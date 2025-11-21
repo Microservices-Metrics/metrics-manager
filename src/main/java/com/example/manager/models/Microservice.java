@@ -16,7 +16,7 @@ import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "TB_MICROSERVICE")
+@Table(name = "TB_MICROSERVICES")
 public class Microservice implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

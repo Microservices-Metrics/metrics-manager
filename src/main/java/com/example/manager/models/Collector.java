@@ -18,11 +18,12 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
-@Table(name = "TB_COLLECTOR")
+@Table(name = "TB_COLLECTORS")
 public class Collector implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
+    
     private String name;
     private String description;
     private String collectionMethod;
@@ -40,7 +41,6 @@ public class Collector implements Serializable {
     @JsonManagedReference("collector-metadata")
     private List<CollectorMetadata> metadata = new ArrayList<>();
 
-    // TODO: preciso dos getters e setters?
     @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference("collector-configs")
     private List<CollectorConfig> configs = new ArrayList<>();
@@ -100,5 +100,21 @@ public class Collector implements Serializable {
 
     public void setResponseSchemas(List<CollectorResponseSchema> responseSchemas) {
         this.responseSchemas = responseSchemas;
+    }
+
+    public List<CollectorMetadata> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(List<CollectorMetadata> metadata) {
+        this.metadata = metadata;
+    }
+
+    public List<CollectorConfig> getConfigs() {
+        return configs;
+    }
+
+    public void setConfigs(List<CollectorConfig> configs) {
+        this.configs = configs;
     }
 }
