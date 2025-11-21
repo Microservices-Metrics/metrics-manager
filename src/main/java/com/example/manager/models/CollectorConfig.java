@@ -5,6 +5,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import java.util.List;
+import java.util.ArrayList;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.CascadeType;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -28,12 +33,16 @@ public class CollectorConfig implements Serializable {
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "id_microservice", nullable = false)
-    @JsonBackReference("collector-configs")
+    @JsonBackReference("microservice-collector-configs")
     private Microservice microservice;
 
     private String cronExpression;
     private LocalDateTime startDateTime;
     private LocalDateTime endDateTime;
+
+    @OneToMany(mappedBy = "collectorConfig", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("collectorconfig-measurements")
+    private List<Measurement> measurements = new ArrayList<>();
 
     public UUID getId() {
         return id;

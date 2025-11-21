@@ -6,6 +6,9 @@ import java.util.UUID;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -13,6 +16,8 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "TB_COLLECTOR_METADATA")
 public class CollectorMetadata implements Serializable {
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
     
     @ManyToOne(optional = false)

@@ -23,7 +23,7 @@ public class Measurement implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "collector_config_id")
-    @JsonBackReference("collector-configs")
+    @JsonBackReference("collectorconfig-measurements")
     private CollectorConfig collectorConfig;
 
     private LocalDateTime startTimestamp;

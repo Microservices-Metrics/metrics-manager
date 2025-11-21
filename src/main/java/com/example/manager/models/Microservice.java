@@ -29,7 +29,7 @@ public class Microservice implements Serializable {
     private List<MicroserviceMetadata> metadatas = new ArrayList<>();
 
     @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true)
-    @JsonManagedReference("collector-configs")
+    @JsonManagedReference("microservice-collector-configs")
     private List<CollectorConfig> collectorConfigs = new ArrayList<>();
 
     public UUID getId() {
