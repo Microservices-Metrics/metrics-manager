@@ -22,10 +22,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-// TODO: criar camada MetricsService
 @RestController
 @RequestMapping("/metrics")
-public class MetricsController {
+public class MetricController {
 
     @Autowired
     private IMetricRepository metricRepository;
@@ -39,6 +38,7 @@ public class MetricsController {
         List<MetricDto> dtos = metrics.stream()
                 .map(metric -> modelMapper.map(metric, MetricDto.class))
                 .collect(Collectors.toList());
+
         return ResponseEntity.ok(dtos);
     }
 
@@ -49,6 +49,7 @@ public class MetricsController {
             return ResponseEntity.notFound().build();
         }
         MetricDto dto = modelMapper.map(metricOpt.get(), MetricDto.class);
+
         return ResponseEntity.ok(dto);
     }
 
@@ -66,7 +67,9 @@ public class MetricsController {
         if (!metricRepository.existsById(id)) {
             return ResponseEntity.notFound().build();
         }
+
         metricRepository.deleteById(id);
+
         return ResponseEntity.noContent().build();
     }
 }

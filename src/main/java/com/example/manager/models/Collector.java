@@ -45,11 +45,6 @@ public class Collector implements Serializable {
     @JsonManagedReference("collector-configs")
     private List<CollectorConfig> configs = new ArrayList<>();
 
-    
-    // @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
-    // @JsonManagedReference("collector-collections")
-    // private List<Collection> collections = new ArrayList<>();
-
     public UUID getId() {
         return id;
     }

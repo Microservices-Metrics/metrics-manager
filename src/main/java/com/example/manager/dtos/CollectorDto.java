@@ -1,19 +1,25 @@
 package com.example.manager.dtos;
 
+import java.io.Serializable;
 import java.util.UUID;
-import java.util.List;
-import java.util.ArrayList;
 
-public class CollectorDto {
+public class CollectorDto implements Serializable {
     private UUID id;
     private String name;
     private String description;
     private String collectionMethod;
     private UUID metricId;
-    private String url;
-    private String requestSchema;
-    private String pathToMetric;
-    private List<CollectorResponseSchemaDto> responseSchemas = new ArrayList<>();
+
+    public CollectorDto() {
+    }
+
+    public CollectorDto(UUID id, String name, String description, String collectionMethod, UUID metricId) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.collectionMethod = collectionMethod;
+        this.metricId = metricId;
+    }
 
     public UUID getId() {
         return id;
@@ -53,37 +59,5 @@ public class CollectorDto {
 
     public void setMetricId(UUID metricId) {
         this.metricId = metricId;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getRequestSchema() {
-        return requestSchema;
-    }
-
-    public void setRequestSchema(String requestSchema) {
-        this.requestSchema = requestSchema;
-    }
-
-    public String getPathToMetric() {
-        return pathToMetric;
-    }
-
-    public void setPathToMetric(String pathToMetric) {
-        this.pathToMetric = pathToMetric;
-    }
-
-    public List<CollectorResponseSchemaDto> getResponseSchemas() {
-        return responseSchemas;
-    }
-
-    public void setResponseSchemas(List<CollectorResponseSchemaDto> responseSchemas) {
-        this.responseSchemas = responseSchemas;
     }
 }
