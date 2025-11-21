@@ -8,5 +8,5 @@ import org.springframework.stereotype.Repository;
 import com.example.manager.models.Measurement;
 
 @Repository
-public interface ICollectionRepository extends JpaRepository<Measurement, UUID> {
+public interface IMeasurementRepository extends JpaRepository<Measurement, UUID> {
 }

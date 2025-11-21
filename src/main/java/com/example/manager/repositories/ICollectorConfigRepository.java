@@ -1,11 +1,12 @@
 package com.example.manager.repositories;
 
-import com.example.manager.models.MetricService;
+import java.util.UUID;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import java.util.UUID;
+import com.example.manager.models.CollectorConfig;
 
 @Repository
-public interface IMetricServiceRepository extends JpaRepository<MetricService, UUID> {
+public interface ICollectorConfigRepository extends JpaRepository<CollectorConfig, UUID> {
 }

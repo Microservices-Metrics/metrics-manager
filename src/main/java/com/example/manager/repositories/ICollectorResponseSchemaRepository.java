@@ -5,8 +5,8 @@ import java.util.UUID;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.example.manager.models.Measurement;
+import com.example.manager.models.CollectorResponseSchema;
 
 @Repository
-public interface ICollectionRepository extends JpaRepository<Measurement, UUID> {
+public interface ICollectorResponseSchemaRepository extends JpaRepository<CollectorResponseSchema, UUID> {
 }
