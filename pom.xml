@@ -64,6 +64,13 @@
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
 		</dependency>
+
+		<!-- JSON Schema validator (NetworkNT) -->
+		<dependency>
+			<groupId>com.networknt</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>1.0.79</version>
+		</dependency>
 	</dependencies>
 
 	<build>

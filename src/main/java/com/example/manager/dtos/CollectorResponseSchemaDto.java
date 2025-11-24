@@ -8,6 +8,7 @@ public class CollectorResponseSchemaDto implements Serializable {
     private String schema;
     private int statusType;
     private String description;
+    private String example;
 
     public UUID getId() {
         return id;
@@ -39,5 +40,13 @@ public class CollectorResponseSchemaDto implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getExample() {
+        return example;
+    }
+
+    public void setExample(String example) {
+        this.example = example;
     }
 }

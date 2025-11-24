@@ -55,6 +55,9 @@ public class CollectorController {
     @Autowired
     private IMicroserviceRepository microserviceRepository;
 
+    @Autowired
+    private com.example.manager.util.JsonSchemaService jsonSchemaService;
+
     @GetMapping
     public ResponseEntity<List<CollectorDto>> listCollectors() {
         List<Collector> collectors = collectorRepository.findAll();
@@ -100,12 +103,22 @@ public class CollectorController {
                     }
 
                     CollectorResponseSchema rs = rsOpt.get();
+                    try {
+                        jsonSchemaService.validateSchemaString(rsDto.getSchema());
+                    } catch (IllegalArgumentException ex) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
                     rs.setSchema(rsDto.getSchema());
                     rs.setStatusType(rsDto.getStatusType());
                     rs.setDescription(rsDto.getDescription());
                     rs.setCollector(saved);
                     responseSchemaRepository.save(rs);
                 } else {
+                    try {
+                        jsonSchemaService.validateSchemaString(rsDto.getSchema());
+                    } catch (IllegalArgumentException ex) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
                     CollectorResponseSchema rs = new CollectorResponseSchema();
                     rs.setSchema(rsDto.getSchema());
                     rs.setStatusType(rsDto.getStatusType());
@@ -126,6 +139,13 @@ public class CollectorController {
 
                     CollectorMetadata md = mdOpt.get();
                     md.setUrl(mdDto.getUrl());
+                    if (mdDto.getRequestSchema() != null) {
+                        try {
+                            jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
+                        } catch (IllegalArgumentException ex) {
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                        }
+                    }
                     md.setRequestSchema(mdDto.getRequestSchema());
                     md.setPathToMetric(mdDto.getPathToMetric());
                     md.setCollector(saved);
@@ -133,6 +153,13 @@ public class CollectorController {
                 } else {
                     CollectorMetadata md = new CollectorMetadata();
                     md.setUrl(mdDto.getUrl());
+                    if (mdDto.getRequestSchema() != null) {
+                        try {
+                            jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
+                        } catch (IllegalArgumentException ex) {
+                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                        }
+                    }
                     md.setRequestSchema(mdDto.getRequestSchema());
                     md.setPathToMetric(mdDto.getPathToMetric());
                     md.setCollector(saved);
