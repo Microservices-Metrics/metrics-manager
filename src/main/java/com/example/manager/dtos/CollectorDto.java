@@ -2,6 +2,8 @@ package com.example.manager.dtos;
 
 import java.io.Serializable;
 import java.util.UUID;
+import java.util.List;
+import java.util.ArrayList;
 
 public class CollectorDto implements Serializable {
     private UUID id;
@@ -9,6 +11,9 @@ public class CollectorDto implements Serializable {
     private String description;
     private String collectionMethod;
     private UUID metricId;
+    private List<CollectorResponseSchemaDto> responseSchemas = new ArrayList<>();
+    private List<CollectorMetadataDto> metadata = new ArrayList<>();
+    private List<CollectorConfigDto> configs = new ArrayList<>();
 
     public CollectorDto() {
     }
@@ -59,5 +64,29 @@ public class CollectorDto implements Serializable {
 
     public void setMetricId(UUID metricId) {
         this.metricId = metricId;
+    }
+
+    public List<CollectorResponseSchemaDto> getResponseSchemas() {
+        return responseSchemas;
+    }
+
+    public void setResponseSchemas(List<CollectorResponseSchemaDto> responseSchemas) {
+        this.responseSchemas = responseSchemas;
+    }
+
+    public List<CollectorMetadataDto> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(List<CollectorMetadataDto> metadata) {
+        this.metadata = metadata;
+    }
+
+    public List<CollectorConfigDto> getConfigs() {
+        return configs;
+    }
+
+    public void setConfigs(List<CollectorConfigDto> configs) {
+        this.configs = configs;
     }
 }

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
@@ -60,6 +61,25 @@ public class MetricController {
         MetricDto response = modelMapper.map(metric, MetricDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<MetricDto> updateMetric(@PathVariable UUID id, @RequestBody MetricDto dto) {
+        Optional<Metric> metricOpt = metricRepository.findById(id);
+        if (metricOpt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        Metric existing = metricOpt.get();
+        existing.setName(dto.getName());
+        existing.setDescription(dto.getDescription());
+        existing.setType(dto.getType());
+        existing.setUnit(dto.getUnit());
+
+        Metric saved = metricRepository.save(existing);
+        MetricDto response = modelMapper.map(saved, MetricDto.class);
+
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{id}")

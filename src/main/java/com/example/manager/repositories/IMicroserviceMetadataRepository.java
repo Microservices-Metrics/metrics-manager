@@ -9,4 +9,5 @@ import com.example.manager.models.MicroserviceMetadata;
 
 @Repository
 public interface IMicroserviceMetadataRepository extends JpaRepository<MicroserviceMetadata, UUID> {
+	java.util.List<MicroserviceMetadata> findByMicroserviceId(UUID microserviceId);
 }
