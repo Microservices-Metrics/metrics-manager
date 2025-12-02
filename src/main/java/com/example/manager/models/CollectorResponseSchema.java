@@ -3,6 +3,7 @@ package com.example.manager.models;
 import java.io.Serializable;
 import java.util.UUID;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -24,6 +25,7 @@ public class CollectorResponseSchema implements Serializable {
     @JsonBackReference("collector-response-schemas")
     private Collector collector;
     
+    @Column(columnDefinition = "TEXT")
     private String schema;
     private int statusType;
     private String description;

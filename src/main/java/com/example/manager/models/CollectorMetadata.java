@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -26,7 +27,10 @@ public class CollectorMetadata implements Serializable {
     private Collector collector;
 
     private String url;
+    
+    @Column(columnDefinition = "TEXT")
     private String requestSchema;
+    
     private String pathToMetric;
 
     public UUID getId() {

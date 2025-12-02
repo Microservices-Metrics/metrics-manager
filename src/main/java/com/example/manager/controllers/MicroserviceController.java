@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,11 +40,14 @@ public class MicroserviceController {
     @Autowired
     private ICollectorConfigRepository collectorConfigRepository;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping
     public ResponseEntity<List<MicroserviceDto>> getAllMicroservices() {
         List<Microservice> micros = microserviceRepository.findAll();
         List<MicroserviceDto> dtos = micros.stream()
-            .map(this::toDto)
+            .map(m -> modelMapper.map(m, MicroserviceDto.class))
             .collect(Collectors.toList());
 
         return ResponseEntity.ok(dtos);
@@ -56,7 +60,7 @@ public class MicroserviceController {
             return ResponseEntity.notFound().build();
         }
 
-        return ResponseEntity.ok(toDto(opt.get()));
+        return ResponseEntity.ok(modelMapper.map(opt.get(), MicroserviceDto.class));
     }
 
     @PostMapping
@@ -67,24 +71,25 @@ public class MicroserviceController {
 
         if (dto.getMetadatas() != null) {
             for (MicroserviceMetadataDto mdDto : dto.getMetadatas()) {
+                MicroserviceMetadata md;
                 if (mdDto.getId() != null) {
                     Optional<MicroserviceMetadata> mdOpt = microserviceMetadataRepository.findById(mdDto.getId());
                     if (mdOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
 
-                    MicroserviceMetadata md = mdOpt.get();
+                    md = mdOpt.get();
                     md.setVarName(mdDto.getVarName());
                     md.setVarValue(mdDto.getVarValue());
                     md.setMicroservice(micro);
-                    microserviceMetadataRepository.save(md);
                 } else {
-                    MicroserviceMetadata md = new MicroserviceMetadata();
+                    md = new MicroserviceMetadata();
                     md.setVarName(mdDto.getVarName());
                     md.setVarValue(mdDto.getVarValue());
                     md.setMicroservice(micro);
-                    microserviceMetadataRepository.save(md);
                 }
+                md = microserviceMetadataRepository.save(md);
+                micro.getMetadatas().add(md);
             }
         }
 
@@ -97,11 +102,12 @@ public class MicroserviceController {
 
                 CollectorConfig cc = ccOpt.get();
                 cc.setMicroservice(micro);
-                collectorConfigRepository.save(cc);
+                cc = collectorConfigRepository.save(cc);
+                micro.getCollectorConfigs().add(cc);
             }
         }
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(toDto(micro));
+        return ResponseEntity.status(HttpStatus.CREATED).body(modelMapper.map(micro, MicroserviceDto.class));
     }
 
     @PutMapping("/{id}")
@@ -152,32 +158,7 @@ public class MicroserviceController {
             }
         }
 
-        return ResponseEntity.ok(toDto(saved));
-    }
-
-    private MicroserviceDto toDto(Microservice m) {
-        MicroserviceDto dto = new MicroserviceDto();
-        dto.setId(m.getId());
-        dto.setName(m.getName());
-
-        if (m.getMetadatas() != null) {
-            dto.setMetadatas(m.getMetadatas().stream().map(md -> {
-                MicroserviceMetadataDto mdDto = new MicroserviceMetadataDto();
-                mdDto.setId(md.getId());
-                mdDto.setMicroserviceId(md.getMicroservice() != null ? md.getMicroservice().getId() : null);
-                mdDto.setVarName(md.getVarName());
-                mdDto.setVarValue(md.getVarValue());
-                return mdDto;
-            }).collect(Collectors.toList()));
-        }
-
-        if (m.getCollectorConfigs() != null) {
-            dto.setCollectorConfigIds(m.getCollectorConfigs().stream()
-                    .map(cc -> cc.getId())
-                    .collect(Collectors.toList()));
-        }
-
-        return dto;
+        return ResponseEntity.ok(modelMapper.map(saved, MicroserviceDto.class));
     }
 
     @DeleteMapping("/{id}")
@@ -187,6 +168,12 @@ public class MicroserviceController {
         }
 
         microserviceRepository.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllMicroservices() {
+        microserviceRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
 }

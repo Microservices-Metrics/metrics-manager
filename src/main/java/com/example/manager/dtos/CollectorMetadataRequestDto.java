@@ -1,22 +1,12 @@
 package com.example.manager.dtos;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class CollectorMetadataDto implements Serializable {
-    private UUID id;
+public class CollectorMetadataRequestDto {
     private UUID collectorId;
     private String url;
     private String requestSchema;
     private String pathToMetric;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public UUID getCollectorId() {
         return collectorId;

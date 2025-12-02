@@ -1,23 +1,13 @@
 package com.example.manager.dtos;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class CollectorConfigDto implements Serializable {
-    private UUID id;
+public class CollectorConfigRequestDto {
     private UUID collectorId;
     private UUID microserviceId;
     private String cronExpression;
-    private String startDateTime; // ISO string
-    private String endDateTime;   // ISO string
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
+    private String startDateTime;
+    private String endDateTime;
 
     public UUID getCollectorId() {
         return collectorId;

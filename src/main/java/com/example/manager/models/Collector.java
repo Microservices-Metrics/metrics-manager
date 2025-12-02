@@ -13,6 +13,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -33,15 +34,15 @@ public class Collector implements Serializable {
     @JsonBackReference("metric-collectors")
     private Metric metric;
 
-    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference("collector-response-schemas")
     private List<CollectorResponseSchema> responseSchemas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference("collector-metadata")
     private List<CollectorMetadata> metadata = new ArrayList<>();
 
-    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "collector", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference("collector-configs")
     private List<CollectorConfig> configs = new ArrayList<>();
 

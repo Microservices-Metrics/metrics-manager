@@ -3,9 +3,8 @@ package com.example.manager.dtos;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class CollectorMetadataDto implements Serializable {
+public class CollectorMetadataResponseDto implements Serializable {
     private UUID id;
-    private UUID collectorId;
     private String url;
     private String requestSchema;
     private String pathToMetric;
@@ -16,14 +15,6 @@ public class CollectorMetadataDto implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public UUID getCollectorId() {
-        return collectorId;
-    }
-
-    public void setCollectorId(UUID collectorId) {
-        this.collectorId = collectorId;
     }
 
     public String getUrl() {

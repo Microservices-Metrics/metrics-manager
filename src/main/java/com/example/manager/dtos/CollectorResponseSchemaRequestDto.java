@@ -1,23 +1,12 @@
 package com.example.manager.dtos;
 
-import java.io.Serializable;
 import java.util.UUID;
 
-public class CollectorResponseSchemaDto implements Serializable {
-    private UUID id;
+public class CollectorResponseSchemaRequestDto {
     private UUID collectorId;
     private String schema;
     private int statusType;
     private String description;
-    private String example;
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public UUID getCollectorId() {
         return collectorId;
@@ -49,13 +38,5 @@ public class CollectorResponseSchemaDto implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getExample() {
-        return example;
-    }
-
-    public void setExample(String example) {
-        this.example = example;
     }
 }

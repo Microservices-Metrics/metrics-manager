@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.manager.dtos.CollectorDto;
+import com.example.manager.dtos.CollectorResponseDto;
 import com.example.manager.dtos.CollectorResponseSchemaDto;
 import com.example.manager.dtos.CollectorMetadataDto;
 import com.example.manager.dtos.CollectorConfigDto;
@@ -32,6 +34,7 @@ import com.example.manager.repositories.ICollectorResponseSchemaRepository;
 import com.example.manager.repositories.ICollectorMetadataRepository;
 import com.example.manager.repositories.ICollectorConfigRepository;
 import com.example.manager.repositories.IMicroserviceRepository;
+import com.example.manager.util.JsonSchemaService;
 
 @RestController
 @RequestMapping("/collectors")
@@ -56,13 +59,17 @@ public class CollectorController {
     private IMicroserviceRepository microserviceRepository;
 
     @Autowired
-    private com.example.manager.util.JsonSchemaService jsonSchemaService;
+    private JsonSchemaService jsonSchemaService;
+
+    @Autowired
+    private ModelMapper modelMapper;
 
     @GetMapping
     public ResponseEntity<List<CollectorDto>> listCollectors() {
         List<Collector> collectors = collectorRepository.findAll();
-        List<CollectorDto> dtos = collectors.stream().map(this::toDto).collect(Collectors.toList());
-
+        List<CollectorDto> dtos = collectors.stream()
+                .map(c -> modelMapper.map(c, CollectorDto.class))
+                .collect(Collectors.toList());
         return ResponseEntity.ok(dtos);
     }
 
@@ -72,12 +79,11 @@ public class CollectorController {
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(toDto(opt.get()));
+        return ResponseEntity.ok(modelMapper.map(opt.get(), CollectorDto.class));
     }
 
     @PostMapping
-    public ResponseEntity<CollectorDto> createCollector(@RequestBody CollectorDto dto) {
+    public ResponseEntity<CollectorResponseDto> createCollector(@RequestBody CollectorDto dto) {
         Collector collector = new Collector();
         collector.setName(dto.getName());
         collector.setDescription(dto.getDescription());
@@ -96,81 +102,62 @@ public class CollectorController {
 
         if (dto.getResponseSchemas() != null) {
             for (CollectorResponseSchemaDto rsDto : dto.getResponseSchemas()) {
+                CollectorResponseSchema rs;
                 if (rsDto.getId() != null) {
                     Optional<CollectorResponseSchema> rsOpt = responseSchemaRepository.findById(rsDto.getId());
                     if (rsOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorResponseSchema rs = rsOpt.get();
-                    try {
-                        jsonSchemaService.validateSchemaString(rsDto.getSchema());
-                    } catch (IllegalArgumentException ex) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                    }
-                    rs.setSchema(rsDto.getSchema());
-                    rs.setStatusType(rsDto.getStatusType());
-                    rs.setDescription(rsDto.getDescription());
-                    rs.setCollector(saved);
-                    responseSchemaRepository.save(rs);
+                    rs = rsOpt.get();
                 } else {
-                    try {
-                        jsonSchemaService.validateSchemaString(rsDto.getSchema());
-                    } catch (IllegalArgumentException ex) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                    }
-                    CollectorResponseSchema rs = new CollectorResponseSchema();
-                    rs.setSchema(rsDto.getSchema());
-                    rs.setStatusType(rsDto.getStatusType());
-                    rs.setDescription(rsDto.getDescription());
-                    rs.setCollector(saved);
-                    responseSchemaRepository.save(rs);
+                    rs = new CollectorResponseSchema();
                 }
+                
+                try {
+                    jsonSchemaService.validateSchemaString(rsDto.getSchema());
+                } catch (IllegalArgumentException ex) {
+                    return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                }
+                rs.setSchema(rsDto.getSchema());
+                rs.setStatusType(rsDto.getStatusType());
+                rs.setDescription(rsDto.getDescription());
+                rs.setCollector(saved);
+
+                saved.getResponseSchemas().add(rs);
             }
         }
 
         if (dto.getMetadata() != null) {
             for (CollectorMetadataDto mdDto : dto.getMetadata()) {
+                CollectorMetadata md;
                 if (mdDto.getId() != null) {
                     Optional<CollectorMetadata> mdOpt = collectorMetadataRepository.findById(mdDto.getId());
                     if (mdOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorMetadata md = mdOpt.get();
-                    md.setUrl(mdDto.getUrl());
-                    if (mdDto.getRequestSchema() != null) {
-                        try {
-                            jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
-                        } catch (IllegalArgumentException ex) {
-                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                        }
-                    }
-                    md.setRequestSchema(mdDto.getRequestSchema());
-                    md.setPathToMetric(mdDto.getPathToMetric());
-                    md.setCollector(saved);
-                    collectorMetadataRepository.save(md);
+                    md = mdOpt.get();
                 } else {
-                    CollectorMetadata md = new CollectorMetadata();
-                    md.setUrl(mdDto.getUrl());
-                    if (mdDto.getRequestSchema() != null) {
-                        try {
-                            jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
-                        } catch (IllegalArgumentException ex) {
-                            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                        }
-                    }
-                    md.setRequestSchema(mdDto.getRequestSchema());
-                    md.setPathToMetric(mdDto.getPathToMetric());
-                    md.setCollector(saved);
-                    collectorMetadataRepository.save(md);
+                    md = new CollectorMetadata();
                 }
+                
+                md.setUrl(mdDto.getUrl());
+                if (mdDto.getRequestSchema() != null) {
+                    try {
+                        jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
+                    } catch (IllegalArgumentException ex) {
+                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+                    }
+                }
+                md.setRequestSchema(mdDto.getRequestSchema());
+                md.setPathToMetric(mdDto.getPathToMetric());
+                md.setCollector(saved);
+
+                saved.getMetadata().add(md);
             }
         }
 
         if (dto.getConfigs() != null) {
             for (CollectorConfigDto ccDto : dto.getConfigs()) {
-                // microserviceId is required for config
                 if (ccDto.getMicroserviceId() == null) {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
@@ -180,44 +167,38 @@ public class CollectorController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
 
+                CollectorConfig cc;
                 if (ccDto.getId() != null) {
                     Optional<CollectorConfig> ccOpt = collectorConfigRepository.findById(ccDto.getId());
                     if (ccOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorConfig cc = ccOpt.get();
-                    cc.setCronExpression(ccDto.getCronExpression());
-                    if (ccDto.getStartDateTime() != null) {
-                        cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
-                    } else {
-                        cc.setStartDateTime(null);
-                    }
-                    if (ccDto.getEndDateTime() != null) {
-                        cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
-                    } else {
-                        cc.setEndDateTime(null);
-                    }
-                    cc.setMicroservice(msOpt.get());
-                    cc.setCollector(saved);
-                    collectorConfigRepository.save(cc);
+                    cc = ccOpt.get();
                 } else {
-                    CollectorConfig cc = new CollectorConfig();
-                    cc.setCronExpression(ccDto.getCronExpression());
-                    if (ccDto.getStartDateTime() != null) {
-                        cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
-                    }
-                    if (ccDto.getEndDateTime() != null) {
-                        cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
-                    }
-                    cc.setMicroservice(msOpt.get());
-                    cc.setCollector(saved);
-                    collectorConfigRepository.save(cc);
+                    cc = new CollectorConfig();
                 }
+                
+                cc.setCronExpression(ccDto.getCronExpression());
+                if (ccDto.getStartDateTime() != null) {
+                    cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
+                } else {
+                    cc.setStartDateTime(null);
+                }
+                if (ccDto.getEndDateTime() != null) {
+                    cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
+                } else {
+                    cc.setEndDateTime(null);
+                }
+                cc.setMicroservice(msOpt.get());
+                cc.setCollector(saved);
+
+                saved.getConfigs().add(cc);
             }
         }
 
-        CollectorDto response = toDto(saved);
+        // Salva o collector novamente com todos os relacionamentos
+        saved = collectorRepository.save(saved);
+        CollectorResponseDto response = modelMapper.map(saved, CollectorResponseDto.class);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
@@ -245,53 +226,50 @@ public class CollectorController {
 
         Collector saved = collectorRepository.save(existing);
 
+        // Limpar as listas existentes
+        saved.getResponseSchemas().clear();
+        saved.getMetadata().clear();
+        saved.getConfigs().clear();
+
         if (dto.getResponseSchemas() != null) {
             for (CollectorResponseSchemaDto rsDto : dto.getResponseSchemas()) {
+                CollectorResponseSchema rs;
                 if (rsDto.getId() != null) {
                     Optional<CollectorResponseSchema> rsOpt = responseSchemaRepository.findById(rsDto.getId());
                     if (rsOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorResponseSchema rs = rsOpt.get();
-                    rs.setSchema(rsDto.getSchema());
-                    rs.setStatusType(rsDto.getStatusType());
-                    rs.setDescription(rsDto.getDescription());
-                    rs.setCollector(saved);
-                    responseSchemaRepository.save(rs);
+                    rs = rsOpt.get();
                 } else {
-                    CollectorResponseSchema rs = new CollectorResponseSchema();
-                    rs.setSchema(rsDto.getSchema());
-                    rs.setStatusType(rsDto.getStatusType());
-                    rs.setDescription(rsDto.getDescription());
-                    rs.setCollector(saved);
-                    responseSchemaRepository.save(rs);
+                    rs = new CollectorResponseSchema();
                 }
+                
+                rs.setSchema(rsDto.getSchema());
+                rs.setStatusType(rsDto.getStatusType());
+                rs.setDescription(rsDto.getDescription());
+                rs.setCollector(saved);
+                saved.getResponseSchemas().add(rs);
             }
         }
 
         if (dto.getMetadata() != null) {
             for (CollectorMetadataDto mdDto : dto.getMetadata()) {
+                CollectorMetadata md;
                 if (mdDto.getId() != null) {
                     Optional<CollectorMetadata> mdOpt = collectorMetadataRepository.findById(mdDto.getId());
                     if (mdOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorMetadata md = mdOpt.get();
-                    md.setUrl(mdDto.getUrl());
-                    md.setRequestSchema(mdDto.getRequestSchema());
-                    md.setPathToMetric(mdDto.getPathToMetric());
-                    md.setCollector(saved);
-                    collectorMetadataRepository.save(md);
+                    md = mdOpt.get();
                 } else {
-                    CollectorMetadata md = new CollectorMetadata();
-                    md.setUrl(mdDto.getUrl());
-                    md.setRequestSchema(mdDto.getRequestSchema());
-                    md.setPathToMetric(mdDto.getPathToMetric());
-                    md.setCollector(saved);
-                    collectorMetadataRepository.save(md);
+                    md = new CollectorMetadata();
                 }
+                
+                md.setUrl(mdDto.getUrl());
+                md.setRequestSchema(mdDto.getRequestSchema());
+                md.setPathToMetric(mdDto.getPathToMetric());
+                md.setCollector(saved);
+                saved.getMetadata().add(md);
             }
         }
 
@@ -306,44 +284,37 @@ public class CollectorController {
                     return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                 }
 
+                CollectorConfig cc;
                 if (ccDto.getId() != null) {
                     Optional<CollectorConfig> ccOpt = collectorConfigRepository.findById(ccDto.getId());
                     if (ccOpt.isEmpty()) {
                         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
                     }
-
-                    CollectorConfig cc = ccOpt.get();
-                    cc.setCronExpression(ccDto.getCronExpression());
-                    if (ccDto.getStartDateTime() != null) {
-                        cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
-                    } else {
-                        cc.setStartDateTime(null);
-                    }
-                    if (ccDto.getEndDateTime() != null) {
-                        cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
-                    } else {
-                        cc.setEndDateTime(null);
-                    }
-                    cc.setMicroservice(msOpt.get());
-                    cc.setCollector(saved);
-                    collectorConfigRepository.save(cc);
+                    cc = ccOpt.get();
                 } else {
-                    CollectorConfig cc = new CollectorConfig();
-                    cc.setCronExpression(ccDto.getCronExpression());
-                    if (ccDto.getStartDateTime() != null) {
-                        cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
-                    }
-                    if (ccDto.getEndDateTime() != null) {
-                        cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
-                    }
-                    cc.setMicroservice(msOpt.get());
-                    cc.setCollector(saved);
-                    collectorConfigRepository.save(cc);
+                    cc = new CollectorConfig();
                 }
+                
+                cc.setCronExpression(ccDto.getCronExpression());
+                if (ccDto.getStartDateTime() != null) {
+                    cc.setStartDateTime(java.time.LocalDateTime.parse(ccDto.getStartDateTime()));
+                } else {
+                    cc.setStartDateTime(null);
+                }
+                if (ccDto.getEndDateTime() != null) {
+                    cc.setEndDateTime(java.time.LocalDateTime.parse(ccDto.getEndDateTime()));
+                } else {
+                    cc.setEndDateTime(null);
+                }
+                cc.setMicroservice(msOpt.get());
+                cc.setCollector(saved);
+                saved.getConfigs().add(cc);
             }
         }
 
-        return ResponseEntity.ok(toDto(saved));
+        // Salva o collector novamente com todos os relacionamentos
+        saved = collectorRepository.save(saved);
+        return ResponseEntity.ok(modelMapper.map(saved, CollectorDto.class));
     }
 
     @DeleteMapping("/{id}")
@@ -357,48 +328,9 @@ public class CollectorController {
         return ResponseEntity.noContent().build();
     }
 
-    private CollectorDto toDto(Collector collector) {
-        CollectorDto dto = new CollectorDto();
-        dto.setId(collector.getId());
-        dto.setName(collector.getName());
-        dto.setDescription(collector.getDescription());
-        dto.setCollectionMethod(collector.getCollectionMethod());
-        dto.setMetricId(collector.getMetricId());
-        
-        if (collector.getResponseSchemas() != null) {
-            dto.setResponseSchemas(collector.getResponseSchemas().stream().map(rs -> {
-                CollectorResponseSchemaDto rsDto = new CollectorResponseSchemaDto();
-                rsDto.setId(rs.getId());
-                rsDto.setSchema(rs.getSchema());
-                rsDto.setStatusType(rs.getStatusType());
-                rsDto.setDescription(rs.getDescription());
-                return rsDto;
-            }).collect(Collectors.toList()));
-        }
-
-        if (collector.getMetadata() != null) {
-            dto.setMetadata(collector.getMetadata().stream().map(md -> {
-                CollectorMetadataDto mdDto = new CollectorMetadataDto();
-                mdDto.setId(md.getId());
-                mdDto.setUrl(md.getUrl());
-                mdDto.setRequestSchema(md.getRequestSchema());
-                mdDto.setPathToMetric(md.getPathToMetric());
-                return mdDto;
-            }).collect(Collectors.toList()));
-        }
-
-        if (collector.getConfigs() != null) {
-            dto.setConfigs(collector.getConfigs().stream().map(cc -> {
-                CollectorConfigDto ccDto = new CollectorConfigDto();
-                ccDto.setId(cc.getId());
-                ccDto.setMicroserviceId(cc.getMicroservice() != null ? cc.getMicroservice().getId() : null);
-                ccDto.setCronExpression(cc.getCronExpression());
-                ccDto.setStartDateTime(cc.getStartDateTime() != null ? cc.getStartDateTime().toString() : null);
-                ccDto.setEndDateTime(cc.getEndDateTime() != null ? cc.getEndDateTime().toString() : null);
-                return ccDto;
-            }).collect(Collectors.toList()));
-        }
-        
-        return dto;
+    @DeleteMapping
+    public ResponseEntity<Void> deleteAllCollectors() {
+        collectorRepository.deleteAll();
+        return ResponseEntity.noContent().build();
     }
 }

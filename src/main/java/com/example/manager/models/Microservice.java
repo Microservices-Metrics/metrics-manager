@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -24,11 +25,11 @@ public class Microservice implements Serializable {
 
     private String name;
 
-    @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference("microservice-metadatas")
     private List<MicroserviceMetadata> metadatas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     @JsonManagedReference("microservice-collector-configs")
     private List<CollectorConfig> collectorConfigs = new ArrayList<>();
 

@@ -3,13 +3,12 @@ package com.example.manager.dtos;
 import java.io.Serializable;
 import java.util.UUID;
 
-public class CollectorConfigDto implements Serializable {
+public class CollectorConfigResponseDto implements Serializable {
     private UUID id;
-    private UUID collectorId;
     private UUID microserviceId;
     private String cronExpression;
-    private String startDateTime; // ISO string
-    private String endDateTime;   // ISO string
+    private String startDateTime;
+    private String endDateTime;
 
     public UUID getId() {
         return id;
@@ -17,14 +16,6 @@ public class CollectorConfigDto implements Serializable {
 
     public void setId(UUID id) {
         this.id = id;
-    }
-
-    public UUID getCollectorId() {
-        return collectorId;
-    }
-
-    public void setCollectorId(UUID collectorId) {
-        this.collectorId = collectorId;
     }
 
     public UUID getMicroserviceId() {
