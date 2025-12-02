@@ -26,12 +26,14 @@ public class CollectorMetadata implements Serializable {
     @JsonBackReference("collector-metadata")
     private Collector collector;
 
-    private String url;
-    
+    private String keyName;
+
     @Column(columnDefinition = "TEXT")
-    private String requestSchema;
-    
-    private String pathToMetric;
+    private String keyValue;
+
+    // private String url;
+    // private String requestSchema;
+    // private String pathToMetric;
 
     public UUID getId() {
         return id;
@@ -49,27 +51,19 @@ public class CollectorMetadata implements Serializable {
         this.collector = collector;
     }
 
-    public String getUrl() {
-        return url;
+    public String getKeyName() {
+        return keyName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
     }
 
-    public String getRequestSchema() {
-        return requestSchema;
+    public String getKeyValue() {
+        return keyValue;
     }
 
-    public void setRequestSchema(String requestSchema) {
-        this.requestSchema = requestSchema;
-    }
-
-    public String getPathToMetric() {
-        return pathToMetric;
-    }
-
-    public void setPathToMetric(String pathToMetric) {
-        this.pathToMetric = pathToMetric;
+    public void setKeyValue(String keyValue) {
+        this.keyValue = keyValue;
     }
 }

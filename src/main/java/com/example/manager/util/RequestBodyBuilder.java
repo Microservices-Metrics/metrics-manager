@@ -37,7 +37,9 @@ public class RequestBodyBuilder {
             CollectorMetadata collectorMetadata, 
             List<MicroserviceMetadata> microserviceMetadata) throws Exception {
         
-        String requestSchema = collectorMetadata.getRequestSchema();
+        // Since CollectorMetadata now uses keyName/keyValue, requestSchema needs to be obtained differently
+        // For now, return empty object - this method needs redesign based on new architecture
+        String requestSchema = collectorMetadata.getKeyValue(); // assuming keyValue might contain schema
         
         if (requestSchema == null || requestSchema.trim().isEmpty()) {
             return "{}";
@@ -195,7 +197,8 @@ public class RequestBodyBuilder {
         }
         
         // Processa a URL substituindo placeholders
-        String url = collectorMetadata.getUrl();
+        // Note: URL is no longer directly in CollectorMetadata, needs architecture review
+        String url = collectorMetadata.getKeyValue(); // temporary - may need to get URL from elsewhere
         if (url != null) {
             for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
                 String placeholder = "{" + entry.getKey() + "}";

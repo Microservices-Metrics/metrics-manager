@@ -4,9 +4,8 @@ import java.util.UUID;
 
 public class CollectorMetadataRequestDto {
     private UUID collectorId;
-    private String url;
-    private String requestSchema;
-    private String pathToMetric;
+    private String keyName;
+    private String keyValue;
 
     public UUID getCollectorId() {
         return collectorId;
@@ -16,27 +15,19 @@ public class CollectorMetadataRequestDto {
         this.collectorId = collectorId;
     }
 
-    public String getUrl() {
-        return url;
+    public String getKeyName() {
+        return keyName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
     }
 
-    public String getRequestSchema() {
-        return requestSchema;
+    public String getKeyValue() {
+        return keyValue;
     }
 
-    public void setRequestSchema(String requestSchema) {
-        this.requestSchema = requestSchema;
-    }
-
-    public String getPathToMetric() {
-        return pathToMetric;
-    }
-
-    public void setPathToMetric(String pathToMetric) {
-        this.pathToMetric = pathToMetric;
+    public void setKeyValue(String keyValue) {
+        this.keyValue = keyValue;
     }
 }

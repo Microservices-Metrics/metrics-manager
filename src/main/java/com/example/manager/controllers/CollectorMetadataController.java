@@ -71,9 +71,8 @@ public class CollectorMetadataController {
         }
 
         CollectorMetadata metadata = new CollectorMetadata();
-        metadata.setUrl(req.getUrl());
-        metadata.setRequestSchema(req.getRequestSchema());
-        metadata.setPathToMetric(req.getPathToMetric());
+        metadata.setKeyName(req.getKeyName());
+        metadata.setKeyValue(req.getKeyValue());
         if (collector != null) {
             metadata.setCollector(collector);
         }
@@ -94,9 +93,8 @@ public class CollectorMetadataController {
                 if (collector == null) return ResponseEntity.badRequest().build();
             }
 
-            existing.setUrl(req.getUrl());
-            existing.setRequestSchema(req.getRequestSchema());
-            existing.setPathToMetric(req.getPathToMetric());
+            existing.setKeyName(req.getKeyName());
+            existing.setKeyValue(req.getKeyValue());
             if (collector != null) existing.setCollector(collector);
 
             CollectorMetadata saved = collectorMetadataRepository.save(existing);

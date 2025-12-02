@@ -140,16 +140,8 @@ public class CollectorController {
                     md = new CollectorMetadata();
                 }
                 
-                md.setUrl(mdDto.getUrl());
-                if (mdDto.getRequestSchema() != null) {
-                    try {
-                        jsonSchemaService.validateSchemaString(mdDto.getRequestSchema());
-                    } catch (IllegalArgumentException ex) {
-                        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-                    }
-                }
-                md.setRequestSchema(mdDto.getRequestSchema());
-                md.setPathToMetric(mdDto.getPathToMetric());
+                md.setKeyName(mdDto.getKeyName());
+                md.setKeyValue(mdDto.getKeyValue());
                 md.setCollector(saved);
 
                 saved.getMetadata().add(md);
@@ -265,9 +257,8 @@ public class CollectorController {
                     md = new CollectorMetadata();
                 }
                 
-                md.setUrl(mdDto.getUrl());
-                md.setRequestSchema(mdDto.getRequestSchema());
-                md.setPathToMetric(mdDto.getPathToMetric());
+                md.setKeyName(mdDto.getKeyName());
+                md.setKeyValue(mdDto.getKeyValue());
                 md.setCollector(saved);
                 saved.getMetadata().add(md);
             }

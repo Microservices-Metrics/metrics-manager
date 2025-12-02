@@ -5,9 +5,8 @@ import java.util.UUID;
 
 public class CollectorMetadataResponseDto implements Serializable {
     private UUID id;
-    private String url;
-    private String requestSchema;
-    private String pathToMetric;
+    private String keyName;
+    private String keyValue;
 
     public UUID getId() {
         return id;
@@ -17,27 +16,19 @@ public class CollectorMetadataResponseDto implements Serializable {
         this.id = id;
     }
 
-    public String getUrl() {
-        return url;
+    public String getKeyName() {
+        return keyName;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
+    public void setKeyName(String keyName) {
+        this.keyName = keyName;
     }
 
-    public String getRequestSchema() {
-        return requestSchema;
+    public String getKeyValue() {
+        return keyValue;
     }
 
-    public void setRequestSchema(String requestSchema) {
-        this.requestSchema = requestSchema;
-    }
-
-    public String getPathToMetric() {
-        return pathToMetric;
-    }
-
-    public void setPathToMetric(String pathToMetric) {
-        this.pathToMetric = pathToMetric;
+    public void setKeyValue(String keyValue) {
+        this.keyValue = keyValue;
     }
 }
