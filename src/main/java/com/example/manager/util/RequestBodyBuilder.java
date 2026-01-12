@@ -1,11 +1,14 @@
 package com.example.manager.util;
 
+import com.example.manager.interfaces.IRequestBodyBuilder;
 import com.example.manager.models.CollectorMetadata;
 import com.example.manager.models.MicroserviceMetadata;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +18,8 @@ import java.util.HashMap;
  * Classe utilitária para construir o corpo de requisições HTTP
  * baseado em JSON Schema e metadados de microserviços.
  */
-public class RequestBodyBuilder {
+@Component
+public class RequestBodyBuilder implements IRequestBodyBuilder {
     
     private final ObjectMapper objectMapper;
     

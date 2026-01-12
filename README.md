@@ -1,5 +1,7 @@
 # Metric Manager
 
+<!-- TODO: Colocar contexto/introdução sobre o projeto. -->
+
 Sistema de gerenciamento de métricas para microserviços, desenvolvido com Spring Boot.
 
 ## 📋 Pré-requisitos
