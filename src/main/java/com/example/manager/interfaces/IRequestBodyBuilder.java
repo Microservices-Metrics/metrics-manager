@@ -22,7 +22,7 @@ public interface IRequestBodyBuilder {
      * @throws Exception se houver erro no processamento do JSON
      */
     String buildRequestBody(
-            CollectorMetadata collectorMetadata, 
+            List<CollectorMetadata> collectorMetadata, 
             List<MicroserviceMetadata> microserviceMetadata) throws Exception;
     
     /**
@@ -35,6 +35,6 @@ public interface IRequestBodyBuilder {
      * @throws Exception se houver erro no processamento
      */
     RequestBodyBuilder.RequestData buildRequestData(
-            CollectorMetadata collectorMetadata,
+            List<CollectorMetadata> collectorMetadata,
             List<MicroserviceMetadata> microserviceMetadata) throws Exception;
 }

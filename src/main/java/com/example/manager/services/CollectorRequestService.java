@@ -41,17 +41,16 @@ public class CollectorRequestService {
         // Obtém os metadados do coletor (pode haver múltiplos)
         // Aqui assumimos o primeiro, mas você pode ajustar conforme sua lógica
         List<CollectorMetadata> collectorMetadataList = collector.getMetadata();
+        
         if (collectorMetadataList.isEmpty()) {
             throw new IllegalStateException("Collector has no metadata configured");
         }
-        
-        CollectorMetadata collectorMetadata = collectorMetadataList.get(0);
-        
+                
         List<MicroserviceMetadata> microserviceMetadata = microservice.getMetadatas();
         
         // Constrói o corpo da requisição usando injeção de dependência
         RequestBodyBuilder.RequestData requestData = requestBodyBuilder.buildRequestData(
-            collectorMetadata, 
+            collectorMetadataList, 
             microserviceMetadata
         );
         
@@ -59,7 +58,7 @@ public class CollectorRequestService {
         return restService.executeHttpRequest(
             requestData.getUrl(),
             requestData.getBody(),
-            collector.getCollectionMethod()
+            collector.getCollectionMethod() // TODO: mudar para pegar dos requestData (metadados)
         );
     }
 }

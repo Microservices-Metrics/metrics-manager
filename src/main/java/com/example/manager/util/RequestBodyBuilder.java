@@ -38,12 +38,15 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
      * @throws Exception se houver erro no processamento do JSON
      */
     public String buildRequestBody(
-            CollectorMetadata collectorMetadata, 
+            List<CollectorMetadata> collectorMetadata, 
             List<MicroserviceMetadata> microserviceMetadata) throws Exception {
         
-        // Since CollectorMetadata now uses keyName/keyValue, requestSchema needs to be obtained differently
-        // For now, return empty object - this method needs redesign based on new architecture
-        String requestSchema = collectorMetadata.getKeyValue(); // assuming keyValue might contain schema
+        // Procura o requestSchema na lista de metadados do coletor
+        String requestSchema = collectorMetadata.stream()
+            .filter(cm -> "requestSchema".equals(cm.getKeyName()))
+            .findFirst()
+            .map(CollectorMetadata::getKeyValue)
+            .orElse(null);
         
         if (requestSchema == null || requestSchema.trim().isEmpty()) {
             return "{}";
@@ -191,7 +194,7 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
      * @return Objeto contendo a URL processada e o body da requisição
      */
     public RequestData buildRequestData(
-            CollectorMetadata collectorMetadata,
+            List<CollectorMetadata> collectorMetadata,
             List<MicroserviceMetadata> microserviceMetadata) throws Exception {
         
         // Converte metadados em mapa
@@ -200,9 +203,13 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
             metadataMap.put(metadata.getVarName(), metadata.getVarValue());
         }
         
-        // Processa a URL substituindo placeholders
-        // Note: URL is no longer directly in CollectorMetadata, needs architecture review
-        String url = collectorMetadata.getKeyValue(); // temporary - may need to get URL from elsewhere
+        // Procura a URL na lista de metadados do coletor
+        String url = collectorMetadata.stream()
+            .filter(cm -> "url".equals(cm.getKeyName()))
+            .findFirst()
+            .map(CollectorMetadata::getKeyValue)
+            .orElse(null);
+
         if (url != null) {
             for (Map.Entry<String, String> entry : metadataMap.entrySet()) {
                 String placeholder = "{" + entry.getKey() + "}";

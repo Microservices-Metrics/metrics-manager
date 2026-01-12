@@ -27,6 +27,7 @@ import com.example.manager.models.Microservice;
 import com.example.manager.repositories.ICollectorConfigRepository;
 import com.example.manager.repositories.ICollectorRepository;
 import com.example.manager.repositories.IMicroserviceRepository;
+import com.example.manager.services.CollectorSchedulingService;
 
 import jakarta.validation.Valid;
 
@@ -42,6 +43,9 @@ public class CollectorConfigController {
 
     @Autowired
     private IMicroserviceRepository microserviceRepository;
+
+    @Autowired
+    private CollectorSchedulingService schedulingService;
 
     @Autowired
     private ModelMapper modelMapper;
@@ -114,6 +118,10 @@ public class CollectorConfigController {
         }
 
         CollectorConfig saved = collectorConfigRepository.save(config);
+        
+        // Agenda a coleta automática
+        schedulingService.scheduleCollection(saved);
+        
         CollectorConfigDto dto = modelMapper.map(saved, CollectorConfigDto.class);
         dto.setCollectorId(saved.getCollector() != null ? saved.getCollector().getId() : null);
         dto.setMicroserviceId(saved.getMicroservice() != null ? saved.getMicroservice().getId() : null);
@@ -153,6 +161,10 @@ public class CollectorConfigController {
             if (microservice != null) existing.setMicroservice(microservice);
 
             CollectorConfig saved = collectorConfigRepository.save(existing);
+            
+            // Reagenda a coleta com as novas configurações
+            schedulingService.scheduleCollection(saved);
+            
             CollectorConfigDto dto = modelMapper.map(saved, CollectorConfigDto.class);
             dto.setCollectorId(saved.getCollector() != null ? saved.getCollector().getId() : null);
             dto.setMicroserviceId(saved.getMicroservice() != null ? saved.getMicroservice().getId() : null);
@@ -169,6 +181,8 @@ public class CollectorConfigController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteCollectorConfig(@PathVariable UUID id) {
         return collectorConfigRepository.findById(id).map(c -> {
+            // Cancela o agendamento antes de deletar
+            schedulingService.cancelScheduledTask(id);
             collectorConfigRepository.delete(c);
             return ResponseEntity.noContent().<Void>build();
         }).orElseGet(() -> ResponseEntity.notFound().build());
@@ -176,6 +190,8 @@ public class CollectorConfigController {
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAllCollectorConfigs() {
+        // Cancela todos os agendamentos
+        schedulingService.cancelAllScheduledTasks();
         collectorConfigRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
