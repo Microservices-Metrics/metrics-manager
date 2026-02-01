@@ -18,7 +18,7 @@ import java.util.HashMap;
  * Classe utilitária para construir o corpo de requisições HTTP
  * baseado em JSON Schema e metadados de microserviços.
  */
-@Component
+@Component("collectorRequestBodyBuilder")
 public class RequestBodyBuilder implements IRequestBodyBuilder {
     
     private final ObjectMapper objectMapper;
