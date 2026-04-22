@@ -15,7 +15,10 @@
 	<description>Microservice to manage the metrics</description>
 	<url/>
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+		</license>
 	</licenses>
 	<developers>
 		<developer/>
@@ -63,6 +66,20 @@
 			<groupId>org.modelmapper</groupId>
 			<artifactId>modelmapper</artifactId>
 			<version>3.2.0</version>
+		</dependency>
+
+		<!-- JSON Schema validator (NetworkNT) -->
+		<dependency>
+			<groupId>com.networknt</groupId>
+			<artifactId>json-schema-validator</artifactId>
+			<version>1.0.79</version>
+		</dependency>
+
+		<!-- SpringDoc OpenAPI -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>2.3.0</version>
 		</dependency>
 	</dependencies>
 
