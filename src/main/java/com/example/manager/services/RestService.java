@@ -2,6 +2,8 @@ package com.example.manager.services;
 
 import com.example.manager.interfaces.IRestService;
 
+import io.micrometer.core.ipc.http.HttpSender.Response;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -30,7 +32,7 @@ public class RestService implements IRestService {
      * @throws Exception se houver erro na execução
      */
     @Override
-    public String executeHttpRequest(String url, String body, String method) throws Exception {
+    public ResponseEntity<String> executeHttpRequest(String url, String body, String method) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         
@@ -44,6 +46,6 @@ public class RestService implements IRestService {
             String.class
         );
         
-        return response.getBody();
+        return response;
     }
 }

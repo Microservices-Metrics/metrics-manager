@@ -10,6 +10,7 @@ import com.example.manager.models.MicroserviceMetadata;
 import com.example.manager.util.RequestBodyBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -34,7 +35,7 @@ public class CollectorRequestService {
      * @return Resposta da requisição HTTP
      * @throws Exception se houver erro na execução
      */
-    public String executeCollection(CollectorConfig collectorConfig) throws Exception {
+    public ResponseEntity<String> executeCollection(CollectorConfig collectorConfig) throws Exception {
         Collector collector = collectorConfig.getCollector();
         Microservice microservice = collectorConfig.getMicroservice();
         
@@ -58,7 +59,7 @@ public class CollectorRequestService {
         return restService.executeHttpRequest(
             requestData.getUrl(),
             requestData.getBody(),
-            collector.getCollectionMethod() // TODO: mudar para pegar dos requestData (metadados)
+            requestData.getHttpMethod()
         );
     }
 }

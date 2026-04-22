@@ -1,13 +1,16 @@
 package com.example.manager.services;
 
 import com.example.manager.models.CollectorConfig;
+import com.example.manager.models.CollectorMetadata;
 import com.example.manager.models.Measurement;
 import com.example.manager.repositories.ICollectorConfigRepository;
 import com.example.manager.repositories.IMeasurementRepository;
 
+import com.jayway.jsonpath.JsonPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
@@ -123,14 +126,14 @@ public class CollectorSchedulingService {
             
             try {
                 // Executa a coleta
-                String response = collectorRequestService.executeCollection(config);
+                ResponseEntity<String> response = collectorRequestService.executeCollection(config);
                 
-                measurement.setResponseStatus("SUCCESS");
-                measurement.setResponseBody(response);
+                measurement.setResponseStatus(response.getStatusCode().toString());
+                measurement.setResponseBody(response.getBody());
                 
-                // Aqui você pode adicionar lógica para extrair o valor da métrica do response
-                // baseado no CollectorResponseSchema, por exemplo:
-                // measurement.setMetricValue(extractMetricValue(response, config));
+                // Extrai o valor da métrica do response baseado no pathToMetric
+                String metricValue = extractMetricValue(response.getBody(), config);
+                measurement.setMetricValue(metricValue);
                 
                 logger.info("Collection successful for CollectorConfig ID: {}", configId);
                 
@@ -169,5 +172,47 @@ public class CollectorSchedulingService {
             logger.info("Cancelled task for CollectorConfig ID: {}", id);
         });
         scheduledTasks.clear();
+    }
+    
+    /**
+     * Extrai o valor da métrica do corpo da resposta JSON baseado no pathToMetric.
+     * 
+     * @param responseBody Corpo da resposta JSON
+     * @param config Configuração do coletor
+     * @return O valor da métrica como String, ou null se não encontrado
+     */
+    private String extractMetricValue(String responseBody, CollectorConfig config) {
+        try {
+            // Busca o metadado com keyName = "pathToMetric"
+            String pathToMetric = config.getCollector().getMetadata().stream()
+                .filter(metadata -> "pathToMetric".equals(metadata.getKeyName()))
+                .map(CollectorMetadata::getKeyValue)
+                .findFirst()
+                .orElse(null);
+            
+            if (pathToMetric == null || pathToMetric.isEmpty()) {
+                logger.warn("PathToMetric not found for CollectorConfig ID: {}", config.getId());
+                return null;
+            }
+            
+            // Usa JSONPath para extrair o valor
+            Object value = JsonPath.read(responseBody, pathToMetric);
+            
+            if (value == null) {
+                logger.warn("Metric value not found at path '{}' for CollectorConfig ID: {}", 
+                    pathToMetric, config.getId());
+                return null;
+            }
+            
+            logger.info("Extracted metric value '{}' from path '{}' for CollectorConfig ID: {}", 
+                value, pathToMetric, config.getId());
+                
+            return value.toString();
+            
+        } catch (Exception e) {
+            logger.error("Failed to extract metric value for CollectorConfig ID: {}", 
+                config.getId(), e);
+            return null;
+        }
     }
 }

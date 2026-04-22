@@ -216,11 +216,18 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
                 url = url.replace(placeholder, entry.getValue());
             }
         }
+
+        // Procura a URL na lista de metadados do coletor
+        String httpMethod = collectorMetadata.stream()
+            .filter(cm -> "httpMethod".equals(cm.getKeyName()))
+            .findFirst()
+            .map(CollectorMetadata::getKeyValue)
+            .orElse(null);
         
         // Constrói o body
         String body = buildRequestBody(collectorMetadata, microserviceMetadata);
         
-        return new RequestData(url, body);
+        return new RequestData(url, body, httpMethod);
     }
     
     /**
@@ -229,10 +236,12 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
     public static class RequestData {
         private final String url;
         private final String body;
+        private final String httpMethod;
         
-        public RequestData(String url, String body) {
+        public RequestData(String url, String body, String httpMethod) {
             this.url = url;
             this.body = body;
+            this.httpMethod = httpMethod;
         }
         
         public String getUrl() {
@@ -241,6 +250,10 @@ public class RequestBodyBuilder implements IRequestBodyBuilder {
         
         public String getBody() {
             return body;
+        }
+
+        public String getHttpMethod() {
+            return httpMethod;
         }
     }
 }
