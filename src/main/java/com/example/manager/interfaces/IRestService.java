@@ -1,5 +1,7 @@
 package com.example.manager.interfaces;
 
+import org.springframework.http.ResponseEntity;
+
 /**
  * Interface para execução de requisições HTTP REST.
  */
@@ -14,5 +16,5 @@ public interface IRestService {
      * @return Resposta da requisição
      * @throws Exception se houver erro na execução
      */
-    String executeHttpRequest(String url, String body, String method) throws Exception;
+    ResponseEntity<String> executeHttpRequest(String url, String body, String method) throws Exception;
 }

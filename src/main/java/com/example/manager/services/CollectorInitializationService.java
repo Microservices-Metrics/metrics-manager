@@ -10,6 +10,7 @@ import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 /**
@@ -36,23 +37,31 @@ public class CollectorInitializationService {
         logger.info("Initializing scheduled collections...");
         
         try {
-            List<CollectorConfig> configs = collectorConfigRepository.findAll();
+            List<CollectorConfig> activeConfigs = collectorConfigRepository.findActiveConfigs(LocalDateTime.now());
             
             int scheduledCount = 0;
-            for (CollectorConfig config : configs) {
-                try {
-                    schedulingService.scheduleCollection(config);
+            for (CollectorConfig config : activeConfigs) {
+                if (scheduleConfig(config)) {
                     scheduledCount++;
-                } catch (Exception e) {
-                    logger.error("Failed to schedule collection for CollectorConfig ID: {}", 
-                        config.getId(), e);
                 }
             }
             
-            logger.info("Successfully scheduled {} collection tasks", scheduledCount);
+            logger.info("Successfully scheduled {} of {} active collection tasks", 
+                scheduledCount, activeConfigs.size());
             
         } catch (Exception e) {
             logger.error("Error during scheduled collections initialization", e);
+        }
+    }
+    
+    private boolean scheduleConfig(CollectorConfig config) {
+        try {
+            schedulingService.scheduleCollection(config);
+            return true;
+        } catch (Exception e) {
+            logger.error("Failed to schedule collection for CollectorConfig ID: {}", 
+                config.getId(), e);
+            return false;
         }
     }
 }
