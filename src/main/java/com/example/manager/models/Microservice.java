@@ -29,7 +29,7 @@ public class Microservice implements Serializable {
     @JsonManagedReference("microservice-metadatas")
     private List<MicroserviceMetadata> metadatas = new ArrayList<>();
 
-    @OneToMany(mappedBy = "microservice", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "microservice", cascade = CascadeType.REMOVE, fetch = FetchType.EAGER)
     @JsonManagedReference("microservice-collector-configs")
     private List<CollectorConfig> collectorConfigs = new ArrayList<>();
 

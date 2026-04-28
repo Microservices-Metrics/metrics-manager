@@ -34,6 +34,7 @@ import com.example.manager.repositories.ICollectorResponseSchemaRepository;
 import com.example.manager.repositories.ICollectorMetadataRepository;
 import com.example.manager.repositories.ICollectorConfigRepository;
 import com.example.manager.repositories.IMicroserviceRepository;
+import com.example.manager.services.CollectorSchedulingService;
 import com.example.manager.util.JsonSchemaService;
 
 @RestController
@@ -57,6 +58,9 @@ public class CollectorController {
 
     @Autowired
     private IMicroserviceRepository microserviceRepository;
+
+    @Autowired
+    private CollectorSchedulingService schedulingService;
 
     @Autowired
     private JsonSchemaService jsonSchemaService;
@@ -314,13 +318,16 @@ public class CollectorController {
         if (opt.isEmpty()) {
             return ResponseEntity.notFound().build();
         }
-        collectorRepository.deleteById(id);
+        Collector collector = opt.get();
+        collector.getConfigs().forEach(config -> schedulingService.cancelScheduledTask(config.getId()));
+        collectorRepository.delete(collector);
 
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping
     public ResponseEntity<Void> deleteAllCollectors() {
+        schedulingService.cancelAllScheduledTasks();
         collectorRepository.deleteAll();
         return ResponseEntity.noContent().build();
     }
