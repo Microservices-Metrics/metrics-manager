@@ -1,5 +1,6 @@
 package com.example.manager.repositories;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,4 +10,5 @@ import com.example.manager.models.Measurement;
 
 @Repository
 public interface IMeasurementRepository extends JpaRepository<Measurement, UUID> {
+    Optional<Measurement> findTopByCollectorConfigIdAndResponseStatusNotOrderByStartTimestampDesc(UUID collectorConfigId, String responseStatus);
 }

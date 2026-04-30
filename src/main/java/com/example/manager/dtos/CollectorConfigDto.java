@@ -58,4 +58,5 @@ public class CollectorConfigDto implements Serializable {
     public void setEndDateTime(String endDateTime) {
         this.endDateTime = endDateTime;
     }
+
 }
