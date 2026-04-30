@@ -10,6 +10,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Column;
 import jakarta.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
@@ -28,6 +30,8 @@ public class Measurement implements Serializable {
 
     private LocalDateTime startTimestamp;
     private String responseStatus;
+
+    @Column(columnDefinition = "TEXT")
     private String responseBody;
     private String metricValue;
     

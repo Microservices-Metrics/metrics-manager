@@ -84,6 +84,7 @@ public class CollectorConfig implements Serializable {
         this.collector = collector;
     }
 
+
     public Microservice getMicroservice() {
         return microservice;
     }

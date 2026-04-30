@@ -49,4 +49,5 @@ public class CollectorConfigResponseDto implements Serializable {
     public void setEndDateTime(String endDateTime) {
         this.endDateTime = endDateTime;
     }
+
 }
