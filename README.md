@@ -108,7 +108,26 @@ A aplicação estará disponível em: `http://localhost:8080`
 
 ---
 
-## 📡 Endpoints da API
+## � Debug Remoto com Docker no VS Code
+
+É possível depurar a aplicação rodando no Docker diretamente pelo VS Code via **remote debugging** (JDWP).
+
+### Como usar
+
+1. **Suba os containers:**
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **No VS Code**, abra o painel **Run & Debug** (`Cmd+Shift+D`), selecione **"Debug (Docker)"** e clique em ▶
+
+3. **Coloque breakpoints** normalmente nos arquivos `.java` — a execução pausará quando o código for atingido.
+
+> Por padrão, a aplicação inicia normalmente sem aguardar o debugger (`suspend=n`). Para que ela **aguarde** o VS Code conectar antes de executar, altere para `suspend=y` no `ENTRYPOINT` do `Dockerfile`.
+
+---
+
+## �📡 Endpoints da API
 
 ### Métricas
 
