@@ -31,6 +31,7 @@ import com.example.manager.repositories.IMicroserviceRepository;
 import com.example.manager.services.CollectorSchedulingService;
 
 import jakarta.validation.Valid;
+import org.springframework.transaction.annotation.Transactional;
 
 @RestController
 @RequestMapping("/collector-configs")
@@ -192,11 +193,22 @@ public class CollectorConfigController {
     }
 
     @DeleteMapping("/{id}")
+    @Transactional
     public ResponseEntity<Void> deleteCollectorConfig(@PathVariable UUID id) {
         return collectorConfigRepository.findById(id).map(c -> {
             // Cancela o agendamento antes de deletar
             schedulingService.cancelScheduledTask(id);
+            
+            // Remove das coleções dos pais para evitar conflito com orphanRemoval
+            if (c.getCollector() != null) {
+                c.getCollector().getConfigs().remove(c);
+            }
+            if (c.getMicroservice() != null) {
+                c.getMicroservice().getCollectorConfigs().remove(c);
+            }
+
             collectorConfigRepository.delete(c);
+            
             return ResponseEntity.noContent().<Void>build();
         }).orElseGet(() -> ResponseEntity.notFound().build());
     }

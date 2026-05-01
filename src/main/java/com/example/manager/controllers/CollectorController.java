@@ -1,5 +1,6 @@
 package com.example.manager.controllers;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,6 +25,7 @@ import com.example.manager.dtos.CollectorResponseSchemaDto;
 import com.example.manager.dtos.CollectorMetadataDto;
 import com.example.manager.dtos.CollectorConfigDto;
 import com.example.manager.models.Collector;
+import com.example.manager.models.CollectorHealthStatus;
 import com.example.manager.models.CollectorResponseSchema;
 import com.example.manager.models.CollectorMetadata;
 import com.example.manager.models.CollectorConfig;
@@ -34,6 +36,7 @@ import com.example.manager.repositories.ICollectorResponseSchemaRepository;
 import com.example.manager.repositories.ICollectorMetadataRepository;
 import com.example.manager.repositories.ICollectorConfigRepository;
 import com.example.manager.repositories.IMicroserviceRepository;
+import com.example.manager.services.CollectorHealthService;
 import com.example.manager.services.CollectorSchedulingService;
 import com.example.manager.util.JsonSchemaService;
 
@@ -61,6 +64,9 @@ public class CollectorController {
 
     @Autowired
     private CollectorSchedulingService schedulingService;
+
+    @Autowired
+    private CollectorHealthService collectorHealthService;
 
     @Autowired
     private JsonSchemaService jsonSchemaService;
@@ -330,5 +336,20 @@ public class CollectorController {
         schedulingService.cancelAllScheduledTasks();
         collectorRepository.deleteAll();
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/health")
+    public ResponseEntity<Collection<CollectorHealthStatus>> getAllHealthStatuses() {
+        return ResponseEntity.ok(collectorHealthService.getAllStatuses());
+    }
+
+    @GetMapping("/{id}/health")
+    public ResponseEntity<CollectorHealthStatus> getCollectorHealth(@PathVariable UUID id) {
+        Optional<Collector> opt = collectorRepository.findById(id);
+        if (opt.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+        CollectorHealthStatus status = collectorHealthService.checkCollector(opt.get());
+        return ResponseEntity.ok(status);
     }
 }
