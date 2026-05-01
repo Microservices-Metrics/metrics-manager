@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.manager.dtos.CollectorConfigDto;
 import com.example.manager.dtos.CollectorConfigRequestDto;
+import com.example.manager.dtos.CollectorTriggerRequestDto;
 import com.example.manager.models.Collector;
 import com.example.manager.models.CollectorConfig;
 import com.example.manager.models.Microservice;
@@ -176,6 +177,18 @@ public class CollectorConfigController {
             }
             return ResponseEntity.ok(dto);
         }).orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/trigger")
+    public ResponseEntity<Void> triggerCollection(@Valid @RequestBody CollectorTriggerRequestDto req) {
+        if (!collectorRepository.existsById(req.getCollectorId())) {
+            return ResponseEntity.notFound().build();
+        }
+        if (!microserviceRepository.existsById(req.getMicroserviceId())) {
+            return ResponseEntity.notFound().build();
+        }
+        schedulingService.triggerCollection(req.getCollectorId(), req.getMicroserviceId());
+        return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/{id}")

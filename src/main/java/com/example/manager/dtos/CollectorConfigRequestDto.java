@@ -48,4 +48,5 @@ public class CollectorConfigRequestDto {
     public void setEndDateTime(String endDateTime) {
         this.endDateTime = endDateTime;
     }
+
 }
